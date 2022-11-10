@@ -1,0 +1,257 @@
+#version 460
+#extension GL_GOOGLE_include_directive : enable
+#include "particle_modules.glsl"
+#define LOCAL_SIZE 32
+layout (local_size_x = LOCAL_SIZE) in;
+
+layout(std430, binding = 0) buffer ParticleEngine_t
+{
+	vec3 m_Position;
+	vec3 m_Rotation;
+	vec3 m_Scale;
+
+	// Initial Lifetime of particles
+	float m_StartLifetimeValue1;		
+	float m_StartLifetimeValue2;		
+	int m_StartLifetimeRandom;			
+
+	// Initial Speed of particles (not direction)
+	float m_StartSpeedValue1;			
+	float m_StartSpeedValue2;			
+	int m_StartSpeedRandom;
+	
+	// Initial Size of particles
+	vec3 m_StartSizeValue1;
+	vec3 m_StartSizeValue2;
+	int m_StartSizeRandom;
+
+	// Initial Rotation of particles
+	vec3 m_StartRotationValue1;
+	vec3 m_StartRotationValue2;
+	int m_StartRotationRandom;
+
+	// Initial Color of particles
+	vec4 m_StartColorValue1;
+	vec4 m_StartColorValue2;
+	int m_StartColorRandom;
+
+	// Gravity inflicted on particles
+	float m_GravityModifierValue1;
+	float m_GravityModifierValue2;
+	int m_GravityModifierRandom;
+
+	int m_ScalingMode;	// Scaling Mode
+
+	// Shape
+	Shape m_Shape;
+
+	// Velocity Overtime
+	VelocityOverLifetime m_VelocityOverLifetime;
+
+	// Force Overtime
+	ForceOverLifetime m_ForceOverLifetime;
+
+	// Color Overtime
+	ColorOverLifetime m_ColorOverLifetime;
+
+	// Size Overtime
+	SizeOverLifetime m_SizeOverLifetime;
+
+	// Rotation Overtime
+	RotationOverLifetime m_RotationOverLifetime;
+
+	// Texture Sheet Animation
+	TextureSheetAnimation m_TextureSheetAnimation;
+
+	// Renderer
+	Renderer m_Renderer;
+
+} ParticleEngine;
+
+layout(std430, binding = 1) buffer ParticleBuffer_t
+{
+	Particle particles[];
+} ParticleBuffer;
+
+layout(std430, binding = 3) buffer ParticleDeadIndices_t
+{
+    uint indices[];
+} DeadIndices;
+
+layout(std430, binding = 4) buffer ParticleAlivePreSimIndices_t
+{
+    uint indices[];
+} AliveIndicesPreSim;
+
+layout(std430, binding = 5) buffer ParticleAlivePostSimIndices_t
+{
+    uint indices[];
+} AliveIndicesPostSim;
+
+layout(std430, binding = 8) buffer ParticleDrawArgs_t
+{
+    uint    indexCount;
+    uint    instanceCount;
+    uint    firstIndex;
+    int     vertexOffset;
+    uint    firstInstance;
+} ParticleDrawArgs;
+
+layout(std430, binding = 2) buffer Counters_t
+{
+    uint dead_count;
+    uint alive_count[2];
+    uint simulation_count;
+    uint emission_count;
+} Counters;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int particles_per_frame;
+    int presimIdx;
+    int postsimIdx;
+    int user_param4;
+    int user_param5;
+    int user_param6;
+    mat4 view_projection_matrix;
+} pushConsts;
+
+void push_dead_index(uint index)
+{
+    uint insert_idx                 = atomicAdd(Counters.dead_count, 1);
+    DeadIndices.indices[insert_idx] = index;
+}
+
+void push_alive_index(uint index)
+{
+    uint insert_idx = atomicAdd(Counters.alive_count[pushConsts.postsimIdx], 1);
+    if (pushConsts.postsimIdx == 1)
+        AliveIndicesPostSim.indices[insert_idx] = index;
+    else
+        AliveIndicesPreSim.indices[insert_idx] = index;
+}
+
+uint pop_alive_index()
+{
+    uint index = atomicAdd(Counters.alive_count[pushConsts.presimIdx], -1);
+    if (pushConsts.presimIdx == 0)
+        return AliveIndicesPreSim.indices[index - 1];
+    else
+        return AliveIndicesPostSim.indices[index - 1];
+}
+
+void main() 
+{
+	uint index = gl_GlobalInvocationID.x;
+
+    if (index < Counters.simulation_count)
+    {
+		// Consume an Alive particle index
+        uint particle_index = pop_alive_index();
+
+		Particle particle = ParticleBuffer.particles[particle_index];
+        vec3 engine_position = pushConsts.world_eye_pos.xyz;
+
+		 // Is it dead?
+        if (particle.m_Lifetime.x >= particle.m_Lifetime.y)
+        {
+            // If dead, just append into the DeadIndices list
+            push_dead_index(particle_index);
+        }
+        else
+        {
+			// If still alive, increment lifetime and run simulation
+			float deltaTime = pushConsts.world_eye_pos.w;	// delta time
+            particle.m_Lifetime.x += deltaTime;
+
+			// Update particle
+
+            vec3 orbital_origin = engine_position + particle.m_OrbitalOffset;
+
+            // Apply gravity
+            vec3 totalForce = particle.m_Forces.xyz;
+            totalForce.y -= particle.m_GravityModifier;
+
+            vec3 velocity_to_apply = vec3(0.0);
+
+            // Apply orbital velocity
+            // x
+            vec3 radial_xaxis = particle.m_Position - vec3(particle.m_Position.x, orbital_origin.yz);
+            vec3 t_velx = cross(vec3(1.0, 0.0, 0.0), radial_xaxis);
+            vec3 x_orbital = t_velx * particle.m_OrbitalVelocity.x;
+            velocity_to_apply += x_orbital;
+            float g_x = dot(x_orbital, x_orbital) * length(radial_xaxis) * particle.m_SpeedModifier;
+            velocity_to_apply -= radial_xaxis * g_x * deltaTime;
+            
+            // y
+            vec3 radial_yaxis = particle.m_Position - vec3(orbital_origin.x, particle.m_Position.y, orbital_origin.z);
+            vec3 t_vely = cross(vec3(0.0, 1.0, 0.0), radial_yaxis);
+            vec3 y_orbital = t_vely * particle.m_OrbitalVelocity.y;
+            velocity_to_apply += y_orbital;
+            float g_y = dot(y_orbital, y_orbital) * length(radial_yaxis) * particle.m_SpeedModifier;
+            velocity_to_apply -= radial_yaxis * g_y * deltaTime;
+
+            // z
+            vec3 radial_zaxis = particle.m_Position - vec3(orbital_origin.xy, particle.m_Position.z);
+            vec3 t_velz = cross(vec3(0.0, 0.0, 1.0), radial_zaxis);
+            vec3 z_orbital = t_velz * particle.m_OrbitalVelocity.z;
+            velocity_to_apply += z_orbital;
+            float g_z = dot(z_orbital, z_orbital) * length(radial_zaxis) * particle.m_SpeedModifier;
+            velocity_to_apply -= radial_zaxis * g_z * deltaTime;
+
+
+            // Apply radial velocity
+            if (abs(particle.m_RadialVelocity) >= 0.001)
+            {
+                vec3 radial_velocity = particle.m_Position - orbital_origin;
+                if (dot(radial_velocity, radial_velocity) > 0.01) radial_velocity = normalize(radial_velocity);
+                velocity_to_apply += radial_velocity * particle.m_RadialVelocity;
+            }
+
+            // Apply force
+            particle.m_Velocity += totalForce * deltaTime;
+
+            // Add current velocity to final velocity
+            velocity_to_apply += particle.m_Velocity;
+
+            // Apply final velocity
+            particle.m_Position += velocity_to_apply * particle.m_SpeedModifier * deltaTime;
+
+            // Color
+            float life_time_ratio = (particle.m_Lifetime.y - particle.m_Lifetime.x) / (particle.m_Lifetime.y - (particle.m_Lifetime.x - deltaTime));
+            particle.m_Color = particle.m_EndColor - (particle.m_EndColor - particle.m_Color) * (life_time_ratio);
+
+            // Size
+            particle.m_Size += particle.m_SizeOverLifetime * deltaTime;
+
+            // Rotation
+            particle.m_Rotation += particle.m_RotationOverLifetime * deltaTime;
+
+            // Update Animation Frame
+            if (ParticleEngine.m_TextureSheetAnimation.m_Enabled > 0)
+            {
+                if (ParticleEngine.m_TextureSheetAnimation.m_Looping > 0 ||
+                    particle.m_CurrentAnimationFrame < particle.m_AnimationFrames.y)
+                {
+                    int frame_count = particle.m_AnimationFrames.y == 0 ? 0 : 
+                    int(floor(particle.m_Lifetime.x * particle.m_FPS)) % 
+                    (particle.m_AnimationFrames.y - particle.m_AnimationFrames.x + 1);
+
+                    particle.m_CurrentAnimationFrame = particle.m_AnimationFrames.x + frame_count;
+                }
+            }
+
+            // End
+			ParticleBuffer.particles[particle_index] = particle;
+
+            // Append index back into AliveIndices list
+            push_alive_index(particle_index);
+
+			// Increment draw count
+            atomicAdd(ParticleDrawArgs.instanceCount, 1);
+		}
+	}
+}

@@ -1,0 +1,78 @@
+#version 460
+#define LOCAL_SIZE 32
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 2) buffer Counters_t
+{
+    uint dead_count;
+    uint alive_count[2];
+    uint simulation_count;
+    uint emission_count;
+} Counters;
+
+layout(std430, binding = 6) buffer EmissionDispatchArgs_t
+{
+    uint num_groups_x;
+    uint num_groups_y;
+    uint num_groups_z;
+}
+EmissionDispatchArgs;
+
+layout(std430, binding = 7) buffer SimulationDispatchArgs_t
+{
+    uint num_groups_x;
+    uint num_groups_y;
+    uint num_groups_z;
+}
+SimulationDispatchArgs;
+
+layout(std430, binding = 8) buffer ParticleDrawArgs_t
+{
+    uint    indexCount;
+    uint    instanceCount;
+    uint    firstIndex;
+    int     vertexOffset;
+    uint    firstInstance;
+}
+ParticleDrawArgs;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int particles_per_frame;
+    int presimIdx;
+    int postsimIdx;
+    int indices_count;
+    int user_param5;
+    int user_param6;
+    mat4 matrix;
+} pushConsts;
+
+void main() 
+{
+	// Reset particle indirect draw instance count
+    ParticleDrawArgs.indexCount     = pushConsts.indices_count;
+    ParticleDrawArgs.instanceCount  = 0;
+    ParticleDrawArgs.firstIndex     = 0;
+    ParticleDrawArgs.vertexOffset  = 0;
+    ParticleDrawArgs.firstInstance  = 0;
+
+    // We can't emit more particles than we have available
+    Counters.emission_count = min(uint(pushConsts.particles_per_frame), Counters.dead_count);
+
+    EmissionDispatchArgs.num_groups_x = uint(ceil(float(Counters.emission_count) / float(LOCAL_SIZE)));
+    EmissionDispatchArgs.num_groups_y = 1;
+    EmissionDispatchArgs.num_groups_z = 1;
+
+    // Calculate total number of particles to simulate this frame
+    Counters.simulation_count = Counters.alive_count[pushConsts.presimIdx] + Counters.emission_count;
+
+    SimulationDispatchArgs.num_groups_x = uint(ceil(float(Counters.simulation_count) / float(LOCAL_SIZE)));
+    SimulationDispatchArgs.num_groups_y = 1;
+    SimulationDispatchArgs.num_groups_z = 1;
+
+    // Reset post sim alive index count
+    Counters.alive_count[pushConsts.postsimIdx] = 0;
+}

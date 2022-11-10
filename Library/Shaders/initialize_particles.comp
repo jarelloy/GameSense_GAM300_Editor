@@ -1,0 +1,46 @@
+#version 460
+#define LOCAL_SIZE 32
+layout (local_size_x = LOCAL_SIZE) in;
+
+layout(std430, binding = 3) buffer ParticleDeadIndices_t
+{
+    uint indices[];
+} DeadIndices;
+
+layout(std430, binding = 2) buffer Counters_t
+{
+    uint dead_count;
+    uint alive_count[2];
+    uint simulation_count;
+    uint emission_count;
+} Counters;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int max_particles;
+    int user_param2;
+    int user_param3;
+    int user_param4;
+    int user_param5;
+    int user_param6;
+    mat4 view_projection_matrix;
+} pushConsts;
+
+void main() 
+{
+	uint index = gl_GlobalInvocationID.x;
+
+    if (index == 0)
+    {
+        // Initialize counts
+        Counters.dead_count     = pushConsts.max_particles;
+        Counters.alive_count[0] = 0;
+        Counters.alive_count[1] = 0;
+    }
+
+    if (index < pushConsts.max_particles)
+        DeadIndices.indices[index] = index;
+}

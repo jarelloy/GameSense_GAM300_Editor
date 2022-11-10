@@ -1,0 +1,61 @@
+{
+    "Entity Data": {
+        "Count": 1,
+        "Data": {
+            "9304695632658563600": {
+                "Name": "Camera",
+                "Layer": 1239175796708298334,
+                "Active": true,
+                "Children": {}
+            }
+        }
+    },
+    "Component Data": {
+        "Count": 2,
+        "Data": {
+            "Transform": {
+                "9304695632658563600": [
+                    {
+                        "m_Position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 1.0
+                        },
+                        "m_Rotation": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "m_Scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                ]
+            },
+            "TextObject": {},
+            "Camera": {
+                "9304695632658563600": [
+                    {
+                        "m_Fov": 45.0,
+                        "m_ZNear": 0.20000000298023225,
+                        "m_ZFar": 50.0,
+                        "m_Pitch": 0.0,
+                        "m_Yaw": 0.0,
+                        "m_ViewportOffset": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "m_ViewportSize": {
+                            "x": 1.0,
+                            "y": 1.0
+                        }
+                    }
+                ]
+            },
+            "Mesh": {},
+            "Material": {}
+        }
+    }
+}

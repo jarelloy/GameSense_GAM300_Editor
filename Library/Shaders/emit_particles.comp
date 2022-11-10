@@ -1,0 +1,832 @@
+#version 460
+#extension GL_GOOGLE_include_directive : enable
+#include "random.glsl"
+#include "particle_modules.glsl"
+#define LOCAL_SIZE 32
+layout (local_size_x = LOCAL_SIZE) in;
+
+layout(std430, binding = 0) buffer ParticleEngine_t
+{
+	vec3 m_Position;
+	vec3 m_Rotation;
+	vec3 m_Scale;
+
+	// Initial Lifetime of particles
+	float m_StartLifetimeValue1;		
+	float m_StartLifetimeValue2;		
+	int m_StartLifetimeRandom;			
+
+	// Initial Speed of particles (not direction)
+	float m_StartSpeedValue1;			
+	float m_StartSpeedValue2;			
+	int m_StartSpeedRandom;
+	
+	// Initial Size of particles
+	vec3 m_StartSizeValue1;
+	vec3 m_StartSizeValue2;
+	int m_StartSizeRandom;
+
+	// Initial Rotation of particles
+	vec3 m_StartRotationValue1;
+	vec3 m_StartRotationValue2;
+	int m_StartRotationRandom;
+
+	// Initial Color of particles
+	vec4 m_StartColorValue1;
+	vec4 m_StartColorValue2;
+	int m_StartColorRandom;
+
+	// Gravity inflicted on particles
+	float m_GravityModifierValue1;
+	float m_GravityModifierValue2;
+	int m_GravityModifierRandom;
+
+	int m_ScalingMode;	// Scaling Mode
+
+	// Shape
+	Shape m_Shape;
+
+	// Velocity Overtime
+	VelocityOverLifetime m_VelocityOverLifetime;
+
+	// Force Overtime
+	ForceOverLifetime m_ForceOverLifetime;
+
+	// Color Overtime
+	ColorOverLifetime m_ColorOverLifetime;
+
+	// Size Overtime
+	SizeOverLifetime m_SizeOverLifetime;
+
+	// Rotation Overtime
+	RotationOverLifetime m_RotationOverLifetime;
+
+	// Texture Sheet Animation
+	TextureSheetAnimation m_TextureSheetAnimation;
+
+	// Renderer
+	Renderer m_Renderer;
+
+} ParticleEngine;
+
+layout(std430, binding = 1) buffer ParticleBuffer_t
+{
+	Particle particles[];
+} ParticleBuffer;
+
+layout(std430, binding = 3) buffer ParticleDeadIndices_t
+{
+    uint indices[];
+} DeadIndices;
+
+layout(std430, binding = 4) buffer ParticleAlivePreSimIndices_t
+{
+    uint indices[];
+} AliveIndicesPreSim;
+
+layout(std430, binding = 5) buffer ParticleAlivePostSimIndices_t
+{
+    uint indices[];
+} AliveIndicesPostSim;
+
+layout(std430, binding = 2) buffer Counters_t
+{
+    uint dead_count;
+    uint alive_count[2];
+    uint simulation_count;
+    uint emission_count;
+} Counters;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 position;
+	vec4 seeds;
+    vec2 viewport_size;
+    int particles_per_frame;
+    int presimIdx;
+    int postsimIdx;
+	int user_param4;
+    int user_param5;
+    int user_param6;
+    mat4 model_matrix;
+} pushConsts;
+
+vec3 seeds = pushConsts.seeds.xyz;
+
+uint pop_dead_index()
+{
+    uint index = atomicAdd(Counters.dead_count, -1);
+    return DeadIndices.indices[index - 1];
+}
+
+void push_alive_index(uint index)
+{
+    uint insert_idx                        = atomicAdd(Counters.alive_count[pushConsts.presimIdx], 1);
+	if (pushConsts.presimIdx == 0)
+		AliveIndicesPreSim.indices[insert_idx] = index;
+	else
+		AliveIndicesPostSim.indices[insert_idx] = index;
+}
+
+mat3 rotateX(float angle)
+{
+	return mat3(vec3(1.0, 0.0, 0.0),vec3(0.0, cos(angle), sin(angle)),vec3(0.0, -sin(angle), cos(angle)));
+}
+
+mat3 rotateY(float angle)
+{
+	return mat3(vec3(cos(angle), 0.0, -sin(angle)),vec3(0.0, 1.0, 0.0),vec3(sin(angle), 0.0, cos(angle)));
+}
+
+mat3 rotateZ(float angle)
+{
+	return mat3(vec3(cos(angle), sin(angle), 0.0), vec3(-sin(angle), cos(angle), 0.0), vec3(0.0, 0.0, 1.0));
+}
+
+mat3 rotateAlign(vec3 v1, vec3 v2)
+{
+    vec3 axis = cross( v1, v2 );
+
+    const float cosA = dot( v1, v2 );
+    const float k = 1.0f / (1.0 + cosA);
+
+    mat3 result = mat3((axis.x * axis.x * k) + cosA,
+                 (axis.y * axis.x * k) - axis.z, 
+                 (axis.z * axis.x * k) + axis.y,
+                 (axis.x * axis.y * k) + axis.z,  
+                 (axis.y * axis.y * k) + cosA,      
+                 (axis.z * axis.y * k) - axis.x,
+                 (axis.x * axis.z * k) - axis.y,  
+                 (axis.y * axis.z * k) + axis.x,  
+                 (axis.z * axis.z * k) + cosA 
+                 );
+
+    return result;
+}
+
+float RandomFloatBtwn(float a, float b)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.yzx;
+
+	return a + (b - a) * rand13(seeds.xyz / (index + 1));
+}
+
+int RandomIntBtwn(int a, int b)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.zyx;
+
+	return a + int(round((b - a) * rand13(seeds.xyz / (index + 1))));
+}
+
+vec2 RandomVec2Btwn(vec2 a, vec2 b)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.yxz;
+
+	vec2 randvec = rand23(seeds.xyz / (index + 1));
+
+	return vec2(
+		a.x + (b.x - a.x) * randvec.x,
+		a.y + (b.y - a.y) * randvec.y
+	);
+}
+
+vec3 RandomVec3Btwn(vec3 a, vec3 b)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.yxz;
+
+	vec3 randvec = rand33(seeds.xyz / (index + 1));
+
+	return vec3(
+		a.x + (b.x - a.x) * randvec.x,
+		a.y + (b.y - a.y) * randvec.y,
+		a.z + (b.z - a.z) * randvec.z
+	);
+}
+
+vec4 RandomVec4Btwn(vec4 a, vec4 b)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.zxy;
+
+	vec4 randvec = rand43(seeds.xyz / (index + 1));
+
+	return vec4(
+		a.x + (b.x - a.x) * randvec.x,
+		a.y + (b.y - a.y) * randvec.y,
+		a.z + (b.z - a.z) * randvec.z,
+		a.w + (b.w - a.w) * randvec.w
+	);
+}
+
+vec2 randomUnitVec2(float angle)
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.xzy;
+
+	float pi = rand13(seeds.xyz / (index + 1)) * angle;
+	return vec2(cos(pi), sin(pi));
+}
+
+vec3 randomUnitVec3()
+{
+	uint index = gl_GlobalInvocationID.x;
+	seeds = seeds.zxy;
+
+	float z = (2.0 * RandomFloatBtwn(0.0, 1.0)) - 1.0;
+	vec2 planar = randomUnitVec2(PI * 2.0) * sqrt(1.0 - z * z);
+	return vec3(planar, z);
+}
+
+float ToRadians(float angle)
+{
+	return (angle * PI) / 180.0;
+}
+
+void InitCone(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
+{
+	float radius = ParticleEngine.m_Shape.m_Radius;
+
+	position = vec3(0.0);
+	vec3 directionToTravel = vec3(randomUnitVec2(ToRadians(ParticleEngine.m_Shape.m_Arc)), 0.0);
+	position += directionToTravel * sqrt(RandomFloatBtwn(1.0 - ParticleEngine.m_Shape.m_RadiusThickness, 1.0)) * radius;				
+
+	float rad_angle = ToRadians(ParticleEngine.m_Shape.m_Angle);
+
+	// Find theta prime x
+	float thetaX = rad_angle * (position.x / radius);
+	float thetaY = rad_angle * (position.y / radius);
+	
+	velocity = rotateX(-thetaY) * rotateY(thetaX) * vec3(0.0, 0.0, 1.0);
+
+	if (ParticleEngine.m_Shape.m_EmitFrom == VOLUME)
+	{
+		position += velocity * RandomFloatBtwn(0.0, ParticleEngine.m_Shape.m_Length);
+	}
+
+	spherized_dir = normalize(position);
+	//velocity = vec3(0.0, 0.0, 0.0);
+}
+
+void InitBox(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
+{
+	float radius = ParticleEngine.m_Shape.m_Radius;
+
+	if (ParticleEngine.m_Shape.m_EmitFrom == BASE || ParticleEngine.m_Shape.m_EmitFrom == VOLUME)
+	{
+		position = vec3(0.0, 0.0, -1.0);
+		vec3 directionToTravel = vec3(RandomVec2Btwn(vec2(0.0, 0.0), vec2(radius, radius)), 0.0);
+		vec2 probability = RandomVec2Btwn(vec2(0.0), vec2(1.0));
+		position.x = position.x + ((probability.x >= 0.5) ? directionToTravel.x : -directionToTravel.x);
+		position.y = position.y + ((probability.y >= 0.5) ? directionToTravel.y : -directionToTravel.y);
+
+		if (ParticleEngine.m_Shape.m_EmitFrom == VOLUME)
+		{
+			position += velocity * RandomFloatBtwn(0.0, radius * 2.0);
+		}
+	}
+	else if (ParticleEngine.m_Shape.m_EmitFrom == SHELL)
+	{
+		position = vec3(0.0, 0.0, -1.0);
+		vec3 directionToTravel = vec3(0.0);
+
+		// Choose 1 fixed side
+		float side = RandomFloatBtwn(0.0, 3.0);
+		float probability = RandomFloatBtwn(0.0, 1.0);
+		vec3 thickness_probability = RandomVec3Btwn(vec3(0.0), ParticleEngine.m_Shape.m_BoxThickness);
+		if (side < 1.0) {
+			directionToTravel.x = probability < 0.5 ? radius - thickness_probability.x: -radius + thickness_probability.x;
+			directionToTravel.yz = RandomVec2Btwn(vec2(-radius), vec2(radius));
+		}
+		else if (side < 2.0) {
+			directionToTravel.y = probability < 0.5 ? radius - thickness_probability.y: -radius + thickness_probability.y;
+			directionToTravel.xz = RandomVec2Btwn(vec2(-radius), vec2(radius));
+		}
+		else {
+			directionToTravel.z = probability < 0.5 ? radius - thickness_probability.z: -radius + thickness_probability.z;
+			directionToTravel.xy = RandomVec2Btwn(vec2(-radius), vec2(radius));
+		}
+
+		position += directionToTravel;
+	}
+	else if (ParticleEngine.m_Shape.m_EmitFrom == EDGE)
+	{
+	    position = vec3(0.0);
+		vec3 probability = RandomVec3Btwn(vec3(0.0), vec3(1.0));
+		vec3 thickness_probability = RandomVec3Btwn(vec3(0.0), ParticleEngine.m_Shape.m_BoxThickness);
+		vec3 directionToTravel = vec3(
+			probability.x < 0.5 ? -radius + thickness_probability.x: radius - thickness_probability.x,
+			probability.y < 0.5 ? -radius + thickness_probability.y: radius - thickness_probability.y,
+			probability.z < 0.5 ? -radius + thickness_probability.z: radius - thickness_probability.z);
+
+		 position += directionToTravel;
+	}
+
+	velocity = vec3(0.0, 0.0, 1.0);
+
+	spherized_dir = normalize(position);
+	//velocity = vec3(0.0);
+}
+
+void InitSphere(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
+{
+	float radius = ParticleEngine.m_Shape.m_Radius;
+	position = vec3(0.0);
+
+	vec3 directionToTravel = randomUnitVec3();
+	position += directionToTravel * RandomFloatBtwn(1.0 - ParticleEngine.m_Shape.m_RadiusThickness, 1.0) * radius;
+
+	velocity = directionToTravel;
+	spherized_dir = directionToTravel;
+}
+
+void InitCircle(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
+{
+	float radius = ParticleEngine.m_Shape.m_Radius;
+
+	position = vec3(0.0);
+	vec3 directionToTravel = vec3(randomUnitVec2(ToRadians(ParticleEngine.m_Shape.m_Arc)), 0.0);
+	position += directionToTravel * sqrt(RandomFloatBtwn(1.0 - ParticleEngine.m_Shape.m_RadiusThickness, 1.0)) * radius;				
+
+	velocity = directionToTravel;
+	spherized_dir = directionToTravel;
+}
+
+void InitRectangle(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
+{
+	float radius = ParticleEngine.m_Shape.m_Radius;
+	position = vec3(0.0, 0.0, 0.0);
+	if (ParticleEngine.m_Shape.m_EmitFrom == BASE || ParticleEngine.m_Shape.m_EmitFrom == VOLUME)
+	{
+		vec3 directionToTravel = vec3(RandomVec2Btwn(vec2(0.0), vec2(radius)), 0.0);
+		vec2 probability = RandomVec2Btwn(vec2(0.0, 0.0), vec2(1.0, 1.0));
+		position.x = position.x + ((probability.x >= 0.5) ? directionToTravel.x : -directionToTravel.x);
+		position.y = position.y + ((probability.y >= 0.5) ? directionToTravel.y : -directionToTravel.y);
+	}
+	else if (ParticleEngine.m_Shape.m_EmitFrom == SHELL)
+	{
+		vec3 directionToTravel = vec3(0.0);
+		vec3 probability = RandomVec3Btwn(vec3(0.0, 0.0, -radius), vec3(1.0, 1.0, radius));
+		vec3 thickness_probability = RandomVec3Btwn(vec3(0.0), ParticleEngine.m_Shape.m_BoxThickness);
+		if (probability.x < 0.5)
+		{
+			directionToTravel.x = probability.y < 0.5 ? -radius + thickness_probability.x : radius - thickness_probability.x;
+			directionToTravel.y = probability.z;
+		}
+		else
+		{
+			directionToTravel.x = probability.z;
+			directionToTravel.y = probability.y < 0.5 ? -radius + thickness_probability.y : radius - thickness_probability.y;
+		}
+
+		position += directionToTravel;
+	}
+	else if (ParticleEngine.m_Shape.m_EmitFrom == EDGE)
+	{
+		vec3 directionToTravel = vec3(0.0);
+		vec2 probability = RandomVec2Btwn(vec2(0.0), vec2(1.0));
+		vec3 thickness_probability = RandomVec3Btwn(vec3(0.0), ParticleEngine.m_Shape.m_BoxThickness);
+		directionToTravel.x = probability.x < 0.5 ? -radius + thickness_probability.x : radius - thickness_probability.x;
+		directionToTravel.y = probability.y < 0.5 ? -radius + thickness_probability.y: radius - thickness_probability.y;
+
+		position += directionToTravel;
+	}
+	velocity = vec3(0.0, 0.0, 1.0);
+	spherized_dir = normalize(position);
+}
+
+void main() 
+{
+	// Emitting particles
+	uint index = gl_GlobalInvocationID.x;
+
+	if (index < Counters.emission_count)
+    {
+		uint particle_index = pop_dead_index();
+
+		Particle particle = ParticleBuffer.particles[particle_index];
+
+		vec3 final_position = vec3(0.0);
+		vec3 final_velocity = vec3(0.0);
+		vec3 unit_vector_spherized_velocity = vec3(0.0);
+
+		mat3 rotation_matrix = 
+		rotateZ(ToRadians(ParticleEngine.m_Rotation.z)) * 
+		rotateY(ToRadians(ParticleEngine.m_Rotation.y)) * 
+		rotateX(ToRadians(ParticleEngine.m_Rotation.x));
+
+		// Shape Module
+		if (ParticleEngine.m_Shape.m_Enabled > 0)
+		{
+			// Set Emitted Particles Initial States
+			if (ParticleEngine.m_Shape.m_Type == CONE)
+			{
+				InitCone(
+					final_position,
+					final_velocity,
+					unit_vector_spherized_velocity
+				);
+			}
+			else if (ParticleEngine.m_Shape.m_Type == BOX)
+			{
+				InitBox(
+					final_position,
+					final_velocity,
+					unit_vector_spherized_velocity
+				);
+			}
+			else if (ParticleEngine.m_Shape.m_Type == SPHERE)
+			{
+				InitSphere(
+					final_position,
+					final_velocity,
+					unit_vector_spherized_velocity
+				);
+			}
+			else if (ParticleEngine.m_Shape.m_Type == CIRCLE)
+			{
+				InitCircle(
+					final_position,
+					final_velocity,
+					unit_vector_spherized_velocity
+				);
+			}
+			else if (ParticleEngine.m_Shape.m_Type == RECTANGLE)
+			{
+				InitRectangle(
+					final_position,
+					final_velocity,
+					unit_vector_spherized_velocity
+				);
+			}
+
+			// Randomize Velocity
+			if (ParticleEngine.m_Shape.m_RandomizeDirection > 0.0)
+			{
+				float weight = ParticleEngine.m_Shape.m_RandomizeDirection;
+				vec3 randomDir = randomUnitVec3();
+				final_velocity = final_velocity * (1.0 - weight) + randomDir * weight;
+			}
+
+			// Spherize Velocity
+			if (ParticleEngine.m_Shape.m_SpherizeDirection > 0.0)
+			{
+				float weight = ParticleEngine.m_Shape.m_SpherizeDirection;
+				final_velocity = final_velocity * (1.0 - weight) + unit_vector_spherized_velocity * weight;
+			}
+			final_velocity = normalize(final_velocity);
+
+			// Set align matrix
+			if (ParticleEngine.m_Shape.m_AlignToDirection > 0.0)
+			{
+				if (abs(final_velocity.x) < 0.001 && abs(final_velocity.y) < 0.001)
+				{
+					if (final_velocity.z < 0.0) particle.m_AlignMat = rotateY(PI);
+					else particle.m_AlignMat = mat3(1.0);
+				}
+				else
+				{
+					// Retrieve rotated desired up vector
+					vec3 desiredUp = vec3(0.0, 1.0, 0.0);
+
+					// Make sure its perpendicular to direction
+					vec3 right = cross(final_velocity, desiredUp);
+					desiredUp = normalize(cross(right, final_velocity));
+
+					// Calculate matrix to rotate to velocity
+					mat3 rot1 = rotateAlign(final_velocity, vec3(0.0, 0.0, 1.0));
+            
+					// Get the new up from prev matrix
+					vec3 newUp = normalize(rot1 * vec3(0.0, 1.0, 0.0));
+
+					// Rotate new up to desired up
+					mat3 rot2 = rotateAlign(desiredUp, newUp);
+
+					particle.m_AlignMat = rot2 * rot1;
+				}
+			}
+			else
+			{
+				particle.m_AlignMat = mat3(1.0);
+			}
+
+			mat3 emitter_rotation_matrix = 
+			rotateZ(ToRadians(ParticleEngine.m_Shape.m_Rotation.z)) * 
+			rotateY(ToRadians(ParticleEngine.m_Shape.m_Rotation.y)) * 
+			rotateX(ToRadians(ParticleEngine.m_Shape.m_Rotation.x));
+
+			// Finalize unit vector velocity
+			final_velocity = rotation_matrix * emitter_rotation_matrix * final_velocity;
+
+			// Finalize position
+			mat3 emitter_scale_matrix = mat3(vec3(ParticleEngine.m_Shape.m_Scale.x, 0.0, 0.0), vec3(0.0, ParticleEngine.m_Shape.m_Scale.y, 0.0), vec3(0.0, 0.0, ParticleEngine.m_Shape.m_Scale.z));
+		
+			final_position = emitter_rotation_matrix * emitter_scale_matrix * final_position;
+			final_position += ParticleEngine.m_Shape.m_Position;
+
+			final_position = vec3(pushConsts.model_matrix * vec4(final_position, 1.0));
+		
+			// Randomize Position
+			if (ParticleEngine.m_Shape.m_RandomizePosition > 0.0)
+			{
+				final_position += randomUnitVec3() * ParticleEngine.m_Shape.m_RandomizePosition;
+			}
+
+			particle.m_Position = final_position;
+		}
+		else
+		{
+			particle.m_AlignMat = mat3(1.0);
+			particle.m_Position = vec3(pushConsts.model_matrix * vec4(0.0, 0.0, 0.0, 1.0));
+			final_velocity = rotation_matrix * vec3(0.0, 0.0, 1.0);
+		}
+		
+		// Speed
+		if (ParticleEngine.m_StartSpeedRandom > 0)
+		{
+			final_velocity *= RandomFloatBtwn(ParticleEngine.m_StartSpeedValue1, ParticleEngine.m_StartSpeedValue2);
+		}
+		else
+		{
+			final_velocity *= ParticleEngine.m_StartSpeedValue1;
+		}
+
+		// Lifetime
+		if (ParticleEngine.m_StartLifetimeRandom > 0)
+		{
+			particle.m_Lifetime = 
+			vec2(0.0, RandomFloatBtwn(ParticleEngine.m_StartLifetimeValue1, ParticleEngine.m_StartLifetimeValue2));
+		}
+		else
+		{
+			particle.m_Lifetime = vec2(0.0, ParticleEngine.m_StartLifetimeValue1);
+		}
+
+		// Size
+		vec3 final_size = vec3(0.0);
+		if (ParticleEngine.m_StartSizeRandom > 0)
+		{
+			final_size = RandomVec3Btwn(ParticleEngine.m_StartSizeValue1, ParticleEngine.m_StartSizeValue2);
+		}
+		else
+		{
+			final_size = ParticleEngine.m_StartSizeValue1;
+		}
+		if (ParticleEngine.m_ScalingMode == WORLD) final_size *= ParticleEngine.m_Scale;
+		particle.m_Size = final_size;
+
+		// Rotation
+		vec3 final_rotation = vec3(0.0);
+		if (ParticleEngine.m_StartRotationRandom > 0)
+		{
+			 final_rotation = RandomVec3Btwn(ParticleEngine.m_StartRotationValue1, ParticleEngine.m_StartRotationValue2);
+		}
+		else
+		{
+			final_rotation = ParticleEngine.m_StartRotationValue1;
+		}
+		final_rotation += ParticleEngine.m_Shape.m_Rotation;
+		particle.m_Rotation = final_rotation;
+
+		// Color
+		if (ParticleEngine.m_StartColorRandom > 0)
+		{
+			particle.m_Color = RandomVec4Btwn(ParticleEngine.m_StartColorValue1, ParticleEngine.m_StartColorValue2);
+		}
+		else
+		{
+			particle.m_Color = ParticleEngine.m_StartColorValue1;
+		}
+
+		if (ParticleEngine.m_GravityModifierRandom > 0)
+		{
+			particle.m_GravityModifier = RandomFloatBtwn(ParticleEngine.m_GravityModifierValue1, ParticleEngine.m_GravityModifierValue2);
+		}
+		else
+		{
+			particle.m_GravityModifier = ParticleEngine.m_GravityModifierValue1;
+		}
+
+		// Velocity Over Lifetime Module
+		if (ParticleEngine.m_VelocityOverLifetime.m_Enabled > 0)
+		{
+			// Linear
+			if (ParticleEngine.m_VelocityOverLifetime.m_LinearRandom > 0)
+			{
+				vec3 linear = RandomVec3Btwn(ParticleEngine.m_VelocityOverLifetime.m_LinearValue1, ParticleEngine.m_VelocityOverLifetime.m_LinearValue2);
+				if (ParticleEngine.m_VelocityOverLifetime.m_Space == LOCAL) linear = rotation_matrix * linear;
+				final_velocity += linear;
+			}
+			else
+			{
+				vec3 linear = ParticleEngine.m_VelocityOverLifetime.m_LinearValue1;
+				if (ParticleEngine.m_VelocityOverLifetime.m_Space == LOCAL) linear = rotation_matrix * linear;
+				final_velocity += linear;
+			}
+
+			// Orbital
+			if (ParticleEngine.m_VelocityOverLifetime.m_OrbitalRandom > 0)
+			{
+				particle.m_OrbitalVelocity = RandomVec3Btwn(
+				ParticleEngine.m_VelocityOverLifetime.m_OrbitalValue1,
+				ParticleEngine.m_VelocityOverLifetime.m_OrbitalValue2);
+			}
+			else
+			{
+				particle.m_OrbitalVelocity = ParticleEngine.m_VelocityOverLifetime.m_OrbitalValue1;
+			}
+			
+			// Orbital Offset
+			if (ParticleEngine.m_VelocityOverLifetime.m_OffsetRandom > 0)
+			{
+				particle.m_OrbitalOffset = RandomVec3Btwn(
+				ParticleEngine.m_VelocityOverLifetime.m_OffsetValue1,
+				ParticleEngine.m_VelocityOverLifetime.m_OffsetValue2);
+			}
+			else
+			{
+				particle.m_OrbitalOffset = ParticleEngine.m_VelocityOverLifetime.m_OffsetValue1;
+			}
+
+			// Radial
+			if (ParticleEngine.m_VelocityOverLifetime.m_RadialRandom > 0)
+			{
+				particle.m_RadialVelocity = RandomFloatBtwn(
+				ParticleEngine.m_VelocityOverLifetime.m_RadialValue1,
+				ParticleEngine.m_VelocityOverLifetime.m_RadialValue2);
+			}
+			else
+			{
+				particle.m_RadialVelocity = ParticleEngine.m_VelocityOverLifetime.m_RadialValue1;
+			}
+
+			// Speed Modifier
+			if (ParticleEngine.m_VelocityOverLifetime.m_SpeedModifierRandom > 0)
+			{
+				particle.m_SpeedModifier = RandomFloatBtwn(
+				ParticleEngine.m_VelocityOverLifetime.m_SpeedModifierValue1,
+				ParticleEngine.m_VelocityOverLifetime.m_SpeedModifierValue2);
+			}
+			else
+			{
+				particle.m_SpeedModifier = ParticleEngine.m_VelocityOverLifetime.m_SpeedModifierValue1;
+			}
+		}
+		else
+		{
+			particle.m_OrbitalVelocity = vec3(0.0);
+			particle.m_OrbitalOffset = vec3(0.0);
+			particle.m_RadialVelocity = 0.0;
+			particle.m_SpeedModifier = 1.0;
+		}
+
+		// Force Over Lifetime
+		if (ParticleEngine.m_ForceOverLifetime.m_Enabled > 0)
+		{
+			// Force
+			if (ParticleEngine.m_ForceOverLifetime.m_ForceRandom > 0)
+			{
+				vec3 force = RandomVec3Btwn(ParticleEngine.m_ForceOverLifetime.m_ForceValue1, ParticleEngine.m_ForceOverLifetime.m_ForceValue2);
+				if (ParticleEngine.m_ForceOverLifetime.m_Space == LOCAL) force = rotation_matrix * force;
+				particle.m_Forces = force;
+			}
+			else
+			{
+				vec3 force = ParticleEngine.m_ForceOverLifetime.m_ForceValue1;
+				if (ParticleEngine.m_ForceOverLifetime.m_Space == LOCAL) force = rotation_matrix * force;
+				particle.m_Forces = force;
+			}
+		}
+		else
+		{
+			particle.m_Forces = vec3(0.0);
+		}
+
+		// Color Over Lifetime
+		if (ParticleEngine.m_ColorOverLifetime.m_Enabled > 0)
+		{
+			// Color
+			if (ParticleEngine.m_ColorOverLifetime.m_ColorRandom > 0)
+			{
+				particle.m_EndColor = RandomVec4Btwn(
+				ParticleEngine.m_ColorOverLifetime.m_ColorValue1,
+				ParticleEngine.m_ColorOverLifetime.m_ColorValue2);
+			}
+			else
+			{
+				particle.m_EndColor = ParticleEngine.m_ColorOverLifetime.m_ColorValue1;
+			}
+		}
+		else
+		{
+			particle.m_EndColor = particle.m_Color;
+		}
+
+		// Size Over Lifetime
+		if (ParticleEngine.m_SizeOverLifetime.m_Enabled > 0)
+		{
+			// Size
+			if (ParticleEngine.m_SizeOverLifetime.m_SizeRandom > 0)
+			{
+				particle.m_SizeOverLifetime = RandomVec3Btwn(
+				ParticleEngine.m_SizeOverLifetime.m_SizeValue1,
+				ParticleEngine.m_SizeOverLifetime.m_SizeValue2);
+			}
+			else
+			{
+				particle.m_SizeOverLifetime = ParticleEngine.m_SizeOverLifetime.m_SizeValue1;
+			}
+		}
+		else
+		{
+			particle.m_SizeOverLifetime = vec3(0.0);
+		}
+
+		// Rotation Over Lifetime
+		if (ParticleEngine.m_RotationOverLifetime.m_Enabled > 0)
+		{
+			// Rotation
+			if (ParticleEngine.m_RotationOverLifetime.m_RotationRandom > 0)
+			{
+				particle.m_RotationOverLifetime = RandomVec3Btwn(
+				ParticleEngine.m_RotationOverLifetime.m_RotationValue1,
+				ParticleEngine.m_RotationOverLifetime.m_RotationValue2);
+			}
+			else
+			{
+				particle.m_RotationOverLifetime = ParticleEngine.m_RotationOverLifetime.m_RotationValue1;
+			}
+		}
+		else
+		{
+			particle.m_RotationOverLifetime = vec3(0.0);
+		}
+
+		particle.m_Velocity = final_velocity;
+
+		// Texture Sheet Animation
+		if (ParticleEngine.m_TextureSheetAnimation.m_Enabled > 0)
+		{
+			// Start Frame
+			if (ParticleEngine.m_TextureSheetAnimation.m_StartFrameRandom > 0)
+			{
+				particle.m_CurrentAnimationFrame = RandomIntBtwn(
+				ParticleEngine.m_TextureSheetAnimation.m_StartFrameValue1,
+				ParticleEngine.m_TextureSheetAnimation.m_StartFrameValue2);
+			}
+			else
+			{
+				particle.m_CurrentAnimationFrame = ParticleEngine.m_TextureSheetAnimation.m_StartFrameValue1;
+			}
+
+			int anim_row = 0;
+			if (ParticleEngine.m_TextureSheetAnimation.m_Animation == RANDOM_ROW)
+			{
+				anim_row = RandomIntBtwn(0, ParticleEngine.m_TextureSheetAnimation.m_Tiles.y);
+			}
+
+			// Animation Frames
+            switch (ParticleEngine.m_TextureSheetAnimation.m_Animation)
+            {
+            case WHOLE_SHEET:
+                particle.m_AnimationFrames = ivec2(0, ParticleEngine.m_TextureSheetAnimation.m_Tiles.x * ParticleEngine.m_TextureSheetAnimation.m_Tiles.y - 1);
+                break;
+            case RANDOM_ROW:
+                int start_frame = anim_row * ParticleEngine.m_TextureSheetAnimation.m_Tiles.x;
+                particle.m_AnimationFrames = ivec2(start_frame, start_frame + ParticleEngine.m_TextureSheetAnimation.m_Tiles.x - 1);
+                break;
+            case CUSTOM_FRAMES:
+                particle.m_AnimationFrames = ParticleEngine.m_TextureSheetAnimation.m_AnimationFrames;
+				break;
+			default:
+				particle.m_AnimationFrames = ivec2(0);
+			}
+
+			// FPS
+			if (ParticleEngine.m_TextureSheetAnimation.m_TimeMode == FPS)
+			{
+				if (ParticleEngine.m_TextureSheetAnimation.m_FPSRandom > 0)
+				{
+					particle.m_FPS = RandomFloatBtwn(
+					ParticleEngine.m_TextureSheetAnimation.m_FPSValue1,
+					ParticleEngine.m_TextureSheetAnimation.m_FPSValue2);
+				}
+				else
+				{
+					particle.m_FPS = ParticleEngine.m_TextureSheetAnimation.m_FPSValue1;
+				}
+			}
+			else
+			{
+				particle.m_FPS = float(particle.m_AnimationFrames.y - particle.m_AnimationFrames.x + 1) / particle.m_Lifetime.y;
+			}
+		}
+
+		ParticleBuffer.particles[particle_index] = particle;
+
+		push_alive_index(particle_index);
+	}
+}

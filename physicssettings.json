@@ -1,0 +1,21 @@
+{
+    "World Name": "",
+    "Gravity": {
+        "x": 0.0,
+        "y": -9.8100004196167,
+        "z": 0.0
+    },
+    "Default Friction Coefficient": 0.30000001192092898,
+    "Default Bounciness": 0.5,
+    "Is Sleeping Enabled": true,
+    "Default Time Before Sleep": 1.0,
+    "Default Velocity Solver Iteration Count": 6,
+    "Default Position Solver Iteration Count": 3,
+    "Default Sleep Linear Velocity": 0.019999999552965165,
+    "Default Sleep Angular Velocity": 0.05235987901687622,
+    "Collision Map": {
+        "1239175796708298334": [
+            1239175796708298334
+        ]
+    }
+}

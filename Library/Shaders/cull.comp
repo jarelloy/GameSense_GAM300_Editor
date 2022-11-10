@@ -1,0 +1,29 @@
+#version 460
+layout (local_size_x = 256) in;
+
+struct ObjectData{
+	mat4 model_matrix;
+};
+
+//all object matrices
+layout(std140, binding = 6) buffer ObjectBuffer
+{
+	ObjectData objects[];
+} objectBuffer;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int user_param;
+    int user_param2;
+	int user_param3;
+    mat4 view_projection_matrix;
+} pushConsts;
+
+void main() 
+{
+	uint gID = gl_GlobalInvocationID.x;
+    objectBuffer.objects[gID].model_matrix = pushConsts.view_projection_matrix * objectBuffer.objects[gID].model_matrix;
+}
