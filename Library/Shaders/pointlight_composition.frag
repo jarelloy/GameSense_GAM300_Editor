@@ -90,6 +90,9 @@ void main()
 
     for (int i = pushConsts.user_param; i < pushConsts.user_param + pushConsts.user_param2; ++i)
     {        
+        // Point light color from gamma to linear
+        vec3 light_color = pow(uniforms.point_light_list[i].color.rgb, vec3(2.20f));
+
         // Vector to light
 		vec3 LightDirection = uniforms.point_light_list[i].position - vertPos;
 		// Distance from light to fragment position
@@ -98,7 +101,7 @@ void main()
 
 	    // Compute the diffuse intensity
 	    float DiffuseI  = max( 0, dot(normal, LightDirection ));
-        vec3 ComputedDiffuse = uniforms.point_light_list[i].intensity * uniforms.point_light_list[i].color.rgb * DiffuseI.rrr * DiffuseColor.rgb;
+        vec3 ComputedDiffuse = uniforms.point_light_list[i].intensity * light_color * DiffuseI.rrr * DiffuseColor.rgb;
 
         // Viewer to fragment
 		vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
@@ -107,7 +110,7 @@ void main()
         // Determine the power for the specular based on how rough something is
         const float Shininess = mix( 1, 100, 1 - texture( uRoughnessTexture, inUV).r );
         float SpecularI2  = pow( max( 0, dot(normal, normalize( LightDirection - EyeDirection ))), Shininess );
-        vec3 ComputedSpecular = uniforms.point_light_list[i].intensity * uniforms.point_light_list[i].color.rgb * SpecularI2.rrr * texture(uGlossinessTexture, inUV).rgb;
+        vec3 ComputedSpecular = uniforms.point_light_list[i].intensity * light_color * SpecularI2.rrr * texture(uGlossinessTexture, inUV).rgb;
 
         // Attenuation
         float denom_atten = (dist / uniforms.point_light_list[i].radius) + 1.0;

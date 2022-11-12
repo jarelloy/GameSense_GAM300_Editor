@@ -6,6 +6,20 @@ layout(location = 0) in struct {
     vec3 Tangent;
 } In;
 
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int user_param;
+    int user_param2;
+    int user_param3;
+    int user_param4;
+    int user_param5;
+    int user_param6;
+    mat4 shadow_matrix;
+} pushConsts;
+
 layout (location = 0) out vec4 outPos;
 layout (location = 1) out vec4 outDiffuse;
 layout (location = 2) out vec4 outNormal;
@@ -46,13 +60,12 @@ void main()
     vec3 tnorm = normalize(TBN * normal);
     outNormal = vec4(tnorm, 1.0);
 
-    // Read the texture colors
-	outDiffuse	= texture(uDiffuseTexture, In.UV);
+	outDiffuse = texture(uDiffuseTexture, In.UV);
 
     outAmbient = texture(uAmbientTexture, In.UV);
 
-    outRoughness = texture(uRoughnessTexture, In.UV);
+    outRoughness = texture(uRoughnessTexture, In.UV) * pushConsts.ambient_color.y;
 
-    outGlossiness = texture(uGlossinessTexture, In.UV);
+    outGlossiness = texture(uGlossinessTexture, In.UV) * pushConsts.ambient_color.x;
 }
 

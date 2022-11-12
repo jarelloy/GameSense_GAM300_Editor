@@ -31,7 +31,7 @@ void main()
 
     // Read the texture colors
     vec4 color = In.Color * texture(uDiffuseTexture, In.UV);
-    //color.rgb *= color.a;
-	outDiffuse = color;
+    const float Gamma = pushConsts.world_eye_pos.w;
+	outDiffuse = vec4(pow(color.rgb, vec3(1.0f/Gamma)), color.a);;
 }
 

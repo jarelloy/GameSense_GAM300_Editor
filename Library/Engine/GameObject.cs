@@ -163,4 +163,10 @@ public class GameObject
         ulong id = InternalCalls.GetEntityIDByName_Native(name);
         return new GameObject(id);
     }
+
+    public static GameObject Find(string name)
+    {
+        ulong id = InternalCalls.GetEntityIDByName_Native(name);
+        return new GameObject(id);
+    }
 }

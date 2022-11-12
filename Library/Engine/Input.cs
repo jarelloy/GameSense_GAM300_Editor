@@ -49,6 +49,54 @@ public class KeyCode
 // keyboard characters are recognized only in CAPITAL form
 public static class Input
 {
+    public static Vector2Int mousePosition
+    {
+        get
+        {
+            InternalCalls.Input_GetMousePosition(out Vector2Int result);
+            return result;
+        }
+    }
+
+    public static int mouseScrollDelta
+    {
+        get
+        {
+            return InternalCalls.Input_GetMouseWheelDelta();
+        }
+    }
+
+    public static int GetMouseX()
+    {
+        return InternalCalls.Input_GetMouseX();
+    }
+
+    public static int GetMouseY()
+    {
+        return InternalCalls.Input_GetMouseY();
+    }
+    public static bool GetMouseButtonTriggered(int key)
+    {
+        switch (key)
+        {
+            case 0: return InternalCalls.Input_GetMouseLButtonTriggered();
+            case 1: return InternalCalls.Input_GetMouseRButtonTriggered();
+            case 2: return InternalCalls.Input_GetMouseMButtonTriggered();
+        }
+        return false;
+    }
+
+    public static bool GetMouseButtonDown(int key)
+    {
+        switch (key)
+        {
+            case 0: return InternalCalls.Input_GetMouseLButton();
+            case 1: return InternalCalls.Input_GetMouseRButton();
+            case 2: return InternalCalls.Input_GetMouseMButton();
+        }
+        return false;
+    }
+
     public static bool IsKeyDown(char key)
     {
         return InternalCalls.IsKeyDown(key);

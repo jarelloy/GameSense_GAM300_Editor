@@ -25,7 +25,10 @@ layout (binding = 5) uniform sampler2D uDiffuseTexture;
 
 void main() 
 {
+    const float Gamma = pushConsts.world_eye_pos.w;
+	vec4 color = texture(uDiffuseTexture, In.UV) * pushConsts.color;
+
     // Read the texture colors
-	outFragColor = texture(uDiffuseTexture, In.UV) * pushConsts.color;
+	outFragColor = vec4(pow(color.rgb, vec3(1.0f/Gamma)), color.a);
 }
 

@@ -276,6 +276,36 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool AnyKeyTriggered();
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Input_GetMousePosition(out Vector2Int outPosition);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Input_GetMouseWheelDelta();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseLButton();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseMButton();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseRButton();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseLButtonTriggered();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseMButtonTriggered();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Input_GetMouseRButtonTriggered();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Input_GetMouseX();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Input_GetMouseY();
+
     #endregion
 
     #region GameObject

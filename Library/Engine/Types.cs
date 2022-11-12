@@ -31,6 +31,131 @@ public struct Vector2
         x = v2.x;
         y = v2.y;
     }
+    public Vector2(Vector3 v3)
+    {
+        x = v3.x;
+        y = v3.y;
+    }
+
+    public static Vector2 operator +(Vector2 rhs) => rhs;
+
+    public static Vector2 operator -(Vector2 rhs) => new Vector2(-rhs.x, -rhs.y);
+
+    public static Vector2 operator +(Vector2 lhs, Vector2 rhs)
+        => new Vector2(lhs.x + rhs.x, lhs.y + rhs.y);
+
+    public static Vector2 operator -(Vector2 lhs, Vector2 rhs)
+        => new Vector2(lhs.x - rhs.x, lhs.y - rhs.y);
+
+    public static Vector2 operator *(Vector2 lhs, float value)
+        => new Vector2(lhs.x * value, lhs.y * value);
+
+    public static Vector2 operator *(float value, Vector2 lhs)
+        => new Vector2(lhs.x * value, lhs.y * value);
+
+    public static Vector2 operator /(Vector2 lhs, float value)
+    {
+        if (value.Equals(0.0f))
+        {
+            throw new DivideByZeroException();
+        }
+        return new Vector2(lhs.x / value, lhs.y / value);
+    }
+
+    public override string ToString() => $"({x}, {y})";
+
+    // shorthand functions
+    public static Vector2 down
+    {
+        get
+        {
+            return new Vector2(0, -1);
+        }
+    }
+
+    public static Vector2 left
+    {
+        get
+        {
+            return new Vector2(-1, 0);
+        }
+    }
+
+    public static Vector2 one
+    {
+        get
+        {
+            return new Vector2(1, 1);
+        }
+    }
+
+    public static Vector2 right
+    {
+        get
+        {
+            return new Vector2(1, 0);
+        }
+    }
+
+    public static Vector2 up
+    {
+        get
+        {
+            return new Vector2(0, 1);
+        }
+    }
+
+    public static Vector2 zero
+    {
+        get
+        {
+            return new Vector2(0, 0);
+        }
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct Vector2Int
+{
+    public int x;
+    public int y;
+    public Vector2Int(int x1, int y1)
+    {
+        x = x1;
+        y = y1;
+    }
+    public Vector2Int(Vector2Int v2)
+    {
+        x = v2.x;
+        y = v2.y;
+    }
+
+    public static Vector2Int operator +(Vector2Int rhs) => rhs;
+
+    public static Vector2Int operator -(Vector2Int rhs) => new Vector2Int(-rhs.x, -rhs.y);
+
+    public static Vector2Int operator +(Vector2Int lhs, Vector2Int rhs)
+        => new Vector2Int(lhs.x + rhs.x, lhs.y + rhs.y);
+
+    public static Vector2Int operator -(Vector2Int lhs, Vector2Int rhs)
+        => new Vector2Int(lhs.x - rhs.x, lhs.y - rhs.y);
+
+    public static Vector2Int operator *(Vector2Int lhs, int value)
+        => new Vector2Int(lhs.x * value, lhs.y * value);
+
+    public static Vector2Int operator *(int value, Vector2Int lhs)
+        => new Vector2Int(lhs.x * value, lhs.y * value);
+
+    public static Vector2Int operator /(Vector2Int lhs, int value)
+    {
+        if (value.Equals(0.0f))
+        {
+            throw new DivideByZeroException();
+        }
+        return new Vector2Int(lhs.x / value, lhs.y / value);
+    }
+
+    public override string ToString() => $"({x}, {y})";
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -52,7 +177,93 @@ public struct Vector3
         y = v2.y;
         z = v2.z;
     }
+    public Vector3(Vector3Int v3i)
+    {
+        x = v3i.x;
+        y = v3i.y;
+        z = v3i.z;
+    }
 
+    public static Vector3 operator +(Vector3 rhs) => rhs;
+
+    public static Vector3 operator -(Vector3 rhs) => new Vector3(-rhs.x, -rhs.y, -rhs.z);
+
+    public static Vector3 operator +(Vector3 lhs, Vector3 rhs)
+        => new Vector3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+
+    public static Vector3 operator -(Vector3 lhs, Vector3 rhs)
+        => new Vector3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+
+    public static Vector3 operator *(Vector3 lhs, float value)
+        => new Vector3(lhs.x * value, lhs.y * value, lhs.z * value);
+
+    public static Vector3 operator *(float value, Vector3 lhs)
+        => new Vector3(lhs.x * value, lhs.y * value, lhs.z * value);
+
+    public static Vector3 operator /(Vector3 lhs, float value)
+    {
+        if (value.Equals(0.0f))
+        {
+            throw new DivideByZeroException();
+        }
+        return new Vector3(lhs.x / value, lhs.y / value, lhs.z / value);
+    }
+
+    public override string ToString() => $"({x}, {y}, {z})";
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct Vector3Int
+{
+    public int x;
+    public int y;
+    public int z;
+
+    public Vector3Int(int x1, int y1, int z1)
+    {
+        x = x1;
+        y = y1;
+        z = z1;
+    }
+    public Vector3Int(Vector3Int v2)
+    {
+        x = v2.x;
+        y = v2.y;
+        z = v2.z;
+    }
+    public Vector3Int(Vector3 v3)
+    {
+        x = (int)v3.x;
+        y = (int)v3.y;
+        z = (int)v3.z;
+    }
+
+    public static Vector3Int operator +(Vector3Int rhs) => rhs;
+
+    public static Vector3Int operator -(Vector3Int rhs) => new Vector3Int(-rhs.x, -rhs.y, -rhs.z);
+
+    public static Vector3Int operator +(Vector3Int lhs, Vector3Int rhs)
+        => new Vector3Int(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+
+    public static Vector3Int operator -(Vector3Int lhs, Vector3Int rhs)
+        => new Vector3Int(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+
+    public static Vector3Int operator *(Vector3Int lhs, int value)
+        => new Vector3Int(lhs.x * value, lhs.y * value, lhs.z * value);
+
+    public static Vector3Int operator *(int value, Vector3Int lhs)
+        => new Vector3Int(lhs.x * value, lhs.y * value, lhs.z * value);
+
+    public static Vector3Int operator /(Vector3Int lhs, int value)
+    {
+        if (value.Equals(0.0f))
+        {
+            throw new DivideByZeroException();
+        }
+        return new Vector3Int(lhs.x / value, lhs.y / value, lhs.z / value);
+    }
+
+    public override string ToString() => $"({x}, {y}, {z})";
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -122,6 +333,33 @@ public struct Vector4
         z = v2.z;
         w = v2.w;
     }
+
+    public static Vector4 operator +(Vector4 rhs) => rhs;
+
+    public static Vector4 operator -(Vector4 rhs) => new Vector4(-rhs.x, -rhs.y, -rhs.z, -rhs.w);
+
+    public static Vector4 operator +(Vector4 lhs, Vector4 rhs)
+        => new Vector4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
+
+    public static Vector4 operator -(Vector4 lhs, Vector4 rhs)
+        => new Vector4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
+
+    public static Vector4 operator *(Vector4 lhs, float value)
+        => new Vector4(lhs.x * value, lhs.y * value, lhs.z * value, lhs.w * value);
+
+    public static Vector4 operator *(float value, Vector4 lhs)
+        => new Vector4(lhs.x * value, lhs.y * value, lhs.z * value, lhs.w * value);
+
+    public static Vector4 operator /(Vector4 lhs, float value)
+    {
+        if (value.Equals(0.0f))
+        {
+            throw new DivideByZeroException();
+        }
+        return new Vector4(lhs.x / value, lhs.y / value, lhs.z / value, lhs.w * value);
+    }
+
+    public override string ToString() => $"({x}, {y}, {z} , {w})";
 }
 
 [StructLayout(LayoutKind.Sequential)]

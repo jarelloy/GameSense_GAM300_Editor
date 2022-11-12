@@ -35,8 +35,11 @@ void main()
     // Read the diffuse color
 	vec4 DiffuseColor = texture(uDiffuseTexture, inUV);
     
+    // Convert ambient from gamma to linear
+    vec3 ambient = pow(pushConsts.ambient_color.rgb, vec3(2.20f));
+
 	// Set the global constribution
-	finalColor.rgb = pushConsts.ambient_color.rgb * DiffuseColor.rgb * texture(uAmbientTexture, inUV).rgb;
+	finalColor.rgb = ambient * DiffuseColor.rgb * texture(uAmbientTexture, inUV).rgb;
 
     outFragColor = finalColor;
     outFragColor.a = DiffuseColor.a;

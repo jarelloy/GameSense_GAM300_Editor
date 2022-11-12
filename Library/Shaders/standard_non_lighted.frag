@@ -30,6 +30,8 @@ void main()
 		discard;
 
     // Read the texture colors
-	outDiffuse	= texture(uDiffuseTexture, In.UV);
+    const float Gamma = pushConsts.world_eye_pos.w;
+    vec4 diffuse = texture(uDiffuseTexture, In.UV);
+	outDiffuse = vec4(pow(diffuse.rgb, vec3(1.0f/Gamma)), diffuse.a);
 }
 
