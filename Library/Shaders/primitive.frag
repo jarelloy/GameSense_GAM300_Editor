@@ -24,10 +24,7 @@ layout (location = 0) out vec4 outFragColor;
 
 void main() 
 {
-	vec2 uv = vec2(gl_FragCoord.x / pushConsts.viewport_size.x, gl_FragCoord.y / pushConsts.viewport_size.y);
-	if (gl_FragCoord.z > texture(uDepthTexture, uv).r)
-		discard;
-
-    outFragColor = In.VertColor;
+    const float Gamma = pushConsts.world_eye_pos.w;
+    outFragColor = vec4(pow(In.VertColor.rgb, vec3(1.0f/Gamma)), In.VertColor.a);
 }
 

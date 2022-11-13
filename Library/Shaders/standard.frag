@@ -33,6 +33,11 @@ layout (binding = 7) uniform sampler2D uAmbientTexture;
 layout (binding = 8) uniform sampler2D uRoughnessTexture;
 layout (binding = 9) uniform sampler2D uGlossinessTexture;
 
+vec3 ToGamma(vec3 color)
+{
+    return pow(color, vec3(2.20f));
+}
+
 void main() 
 {
     outPos = vec4(In.WorldPos, 1.0);
@@ -60,12 +65,14 @@ void main()
     vec3 tnorm = normalize(TBN * normal);
     outNormal = vec4(tnorm, 1.0);
 
-	outDiffuse = texture(uDiffuseTexture, In.UV);
+    vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
+
+	outDiffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
 
     outAmbient = texture(uAmbientTexture, In.UV);
 
-    outRoughness = texture(uRoughnessTexture, In.UV) * pushConsts.ambient_color.y;
+    outRoughness = texture(uRoughnessTexture, In.UV) * pushConsts.viewport_size.y;
 
-    outGlossiness = texture(uGlossinessTexture, In.UV) * pushConsts.ambient_color.x;
+    outGlossiness = texture(uGlossinessTexture, In.UV) * pushConsts.viewport_size.x;
 }
 

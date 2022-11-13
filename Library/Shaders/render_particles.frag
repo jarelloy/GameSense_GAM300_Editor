@@ -20,15 +20,10 @@ layout (std140, push_constant) uniform PushConstants
 
 layout (location = 0) out vec4 outDiffuse;
 
-layout (binding = 3) uniform sampler2D uDepthTexture;
 layout (binding = 7) uniform sampler2D uDiffuseTexture;
 
 void main() 
 {
-	vec2 uv = vec2(gl_FragCoord.x / pushConsts.viewport_size.x, (gl_FragCoord.y / pushConsts.viewport_size.y));
-	if (gl_FragCoord.z > texture(uDepthTexture, uv).r)
-		discard;
-
     // Read the texture colors
     vec4 color = In.Color * texture(uDiffuseTexture, In.UV);
     const float Gamma = pushConsts.world_eye_pos.w;

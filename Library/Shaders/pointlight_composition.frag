@@ -104,7 +104,7 @@ void main()
         vec3 ComputedDiffuse = uniforms.point_light_list[i].intensity * light_color * DiffuseI.rrr * DiffuseColor.rgb;
 
         // Viewer to fragment
-		vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
+		vec3 EyeDirection = vertPos - pushConsts.world_eye_pos.xyz;
 		EyeDirection = normalize(EyeDirection);
 
         // Determine the power for the specular based on how rough something is
