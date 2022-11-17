@@ -64,6 +64,17 @@ public struct Vector2
 
     public override string ToString() => $"({x}, {y})";
 
+    public static Vector2 Lerp(Vector2 startVec, Vector2 endVec, float timer)
+    {
+        timer = Math.Min(timer, 1f);
+        timer = Math.Max(timer, 0f);
+
+        float xValue = startVec.x + (endVec.x - startVec.x) * timer;
+        float yValue = startVec.y + (endVec.y - startVec.y) * timer;
+
+        return new Vector2(xValue, yValue);
+    }
+
     // shorthand functions
     public static Vector2 down
     {
@@ -210,6 +221,20 @@ public struct Vector3
     }
 
     public override string ToString() => $"({x}, {y}, {z})";
+
+    public static Vector3 Lerp(Vector3 startVec, Vector3 endVec, float timer)
+    {
+        timer = Math.Min(timer, 1f);
+        timer = Math.Max(timer, 0f);
+
+        float xValue = startVec.x + (endVec.x - startVec.x) * timer;
+        float yValue = startVec.y + (endVec.y - startVec.y) * timer;
+        float zValue = startVec.z + (endVec.z - startVec.z) * timer;
+
+        return new Vector3(xValue, yValue, zValue);
+    }
+
+
 }
 
 [StructLayout(LayoutKind.Sequential)]

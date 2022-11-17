@@ -6,27 +6,39 @@ using System.Threading.Tasks;
 
 public class Transform : Component
 {
-    //public Transform GlobalTransform
-    //{
-    //    get
-    //    {
-    //        GetGlobalTransform_Native(entity, out Transform result);
-    //        result.layer = GetTransformZDepth_Native(entity);
-    //        return result;
-    //    }
-    //}
+    private bool isGlobalTransform;
+
+    public Transform() : base()
+    {
+        isGlobalTransform = false;
+    }
+
+    public Transform(bool isGlobal)
+    {
+        isGlobalTransform = isGlobal;
+    }
+
+    public Transform globalTransform
+    {
+        get
+        {
+            Transform trans = new Transform(true);
+            trans.entity = this.entity;
+            return trans;
+        }
+    }
 
     public Vector3 position
     {
         get
         {
-            InternalCalls.Transform_GetPosition(entity, out Vector3 result);
+            InternalCalls.Transform_GetPosition(entity, out Vector3 result, isGlobalTransform);
             return result;
         }
 
         set
         {
-            InternalCalls.Transform_SetPosition(entity, ref value);
+            InternalCalls.Transform_SetPosition(entity, ref value, isGlobalTransform);
         }
     }
 
@@ -34,13 +46,13 @@ public class Transform : Component
     {
         get
         {
-            InternalCalls.Transform_GetRotation(entity, out Vector3 result);
+            InternalCalls.Transform_GetRotation(entity, out Vector3 result, isGlobalTransform);
             return result;
         }
 
         set
         {
-            InternalCalls.Transform_SetRotation(entity, ref value);
+            InternalCalls.Transform_SetRotation(entity, ref value, isGlobalTransform);
         }
     }
 
@@ -48,13 +60,13 @@ public class Transform : Component
     {
         get
         {
-            InternalCalls.Transform_GetScale(entity, out Vector3 result);
+            InternalCalls.Transform_GetScale(entity, out Vector3 result, isGlobalTransform);
             return result;
         }
 
         set
         {
-            InternalCalls.Transform_SetScale(entity, ref value);
+            InternalCalls.Transform_SetScale(entity, ref value, isGlobalTransform);
         }
     }
 

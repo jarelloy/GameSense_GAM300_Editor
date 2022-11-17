@@ -30,7 +30,7 @@ void main()
 	// HDR to RGBUNORM
   
     // exposure tone mapping
-    vec3 mapped = hdrColor.rgb; //vec3(1.0) - exp(-hdrColor.rgb * Exposure);
+    vec3 mapped = vec3(1.0) - exp(-hdrColor.rgb * Exposure);
 
     // gamma correction 
     mapped = pow(mapped, vec3(1.0 / Gamma));

@@ -32,7 +32,7 @@ void main()
     vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
 
     // Read the texture colors
-    const float Gamma = pushConsts.world_eye_pos.w;
+    const float Gamma = pushConsts.ambient_color.w;
     vec4 diffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
 	outDiffuse = vec4(pow(diffuse.rgb, vec3(1.0f/Gamma)), diffuse.a);
 }

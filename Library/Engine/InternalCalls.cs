@@ -7,6 +7,31 @@ using System.Threading.Tasks;
 
 public static class InternalCalls
 {
+    #region SceneManager
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern string SceneManager_GetCurrentSceneName();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SceneManager_ChangeScene(string name);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SceneManager_PreloadScene(string name, uint sleepDelay);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float SceneManager_GetPreloadingSceneLoadPercentage(string name);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float SceneManager_GetPreloadingSceneInitPercentage(string name);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool SceneManager_GetPreloadingSceneCompleted(string name);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SceneManager_QuitGame();
+
+    #endregion
+
     #region Time
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -220,22 +245,22 @@ public static class InternalCalls
 
     #region Transform
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_GetPosition(ulong entity, out Vector3 outPosition);
+    internal static extern void Transform_GetPosition(ulong entity, out Vector3 outPosition, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_SetPosition(ulong entity, ref Vector3 inPosition);
+    internal static extern void Transform_SetPosition(ulong entity, ref Vector3 inPosition,  bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_GetRotation(ulong entity, out Vector3 outRotation);
+    internal static extern void Transform_GetRotation(ulong entity, out Vector3 outRotation, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_SetRotation(ulong entity, ref Vector3 inRotation);
+    internal static extern void Transform_SetRotation(ulong entity, ref Vector3 inRotation, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_GetScale(ulong entity, out Vector3 outScale);
+    internal static extern void Transform_GetScale(ulong entity, out Vector3 outScale, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_SetScale(ulong entity, ref Vector3 inScale);
+    internal static extern void Transform_SetScale(ulong entity, ref Vector3 inScale,  bool isGlobal);
 
     /*
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -339,6 +364,106 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void AddTransform_Native(ulong entity);
+
+    #endregion
+
+    #region Audio
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Play(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Stop(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Mute(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Unmute(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Pause(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_Unpause(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetVolume(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetVolume(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetLoop(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetLoop(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetStereo(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetStereo(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetLPF(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetLPF(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetLPFCutoff(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetLPFCutoff(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetLPFResonance(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetLPFResonance(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetReverb(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetReverb(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetReverbDelay(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetReverbDelay(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetReverbFeedback(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetReverbFeedback(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetReverbWetLevel(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetReverbWetLevel(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetReverbDryLevel(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetReverbDryLevel(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetDistortion(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetDistortion(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetDistortionLevel(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetDistortionLevel(ulong entity, float value);
 
     #endregion
 }
