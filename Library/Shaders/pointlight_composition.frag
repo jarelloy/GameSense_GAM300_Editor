@@ -34,8 +34,9 @@ layout (binding = 7) uniform sampler2D uNormalTexture;
 layout (binding = 8) uniform sampler2D uAmbientTexture;
 layout (binding = 9) uniform sampler2D uRoughnessTexture;
 layout (binding = 10) uniform sampler2D uGlossinessTexture;
-layout (binding = 11) uniform samplerCubeArray uPointLightDepthMap;
-layout (binding = 12) uniform sampler2DArray uDirectionalLightDepthMap;
+layout (binding = 11) uniform sampler2D uEmissiveTexture;
+layout (binding = 12) uniform samplerCubeArray uPointLightDepthMap;
+layout (binding = 13) uniform sampler2DArray uDirectionalLightDepthMap;
 
 layout(std140, binding = 2) uniform UBOLights
 {

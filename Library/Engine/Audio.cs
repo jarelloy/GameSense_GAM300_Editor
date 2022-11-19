@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class AudioComponent : Component
 {
-
+    #region basic
     public float volume
     {
         get
@@ -31,7 +31,9 @@ public class AudioComponent : Component
             InternalCalls.Audio_SetLoop(entity, value);
         }
     }
+    #endregion
 
+    #region stereo
     public bool stereo
     {
         get
@@ -44,6 +46,86 @@ public class AudioComponent : Component
         }
     }
 
+    public float stereo_mindistance
+    {
+        get
+        {
+            return InternalCalls.Audio_GetMinDistance(entity);
+        }
+        set
+        {
+            InternalCalls.Audio_SetMinDistance(entity, value);
+        }
+    }
+
+    public float stereo_maxdistance
+    {
+        get
+        {
+            return InternalCalls.Audio_GetMaxDistance(entity);
+        }
+        set
+        {
+            InternalCalls.Audio_SetMaxDistance(entity, value);
+        }
+    }
+    #endregion
+
+    #region fade
+    public bool fadeIn
+    {
+        get
+        {
+            return InternalCalls.Audio_GetFadeIn(entity);
+        }
+
+        set
+        {
+            InternalCalls.Audio_SetFadeIn(entity, value);
+        }
+    }
+
+    public bool fadeOut
+    {
+        get
+        {
+            return InternalCalls.Audio_GetFadeOut(entity);
+        }
+
+        set
+        {
+            InternalCalls.Audio_SetFadeOut(entity, value);
+        }
+    }
+
+    public float fadeInTimer
+    {
+        get
+        {
+            return InternalCalls.Audio_GetFadeInTimer(entity);
+        }
+
+        set
+        {
+            InternalCalls.Audio_SetFadeInTimer(entity, value);
+        }
+    }
+
+    public float fadeOutTimer
+    {
+        get
+        {
+            return InternalCalls.Audio_GetFadeOutTimer(entity);
+        }
+
+        set
+        {
+            InternalCalls.Audio_SetFadeOutTimer(entity, value);
+        }
+    }
+    #endregion 
+
+    #region effects
     public bool lowpassfilter
     {
         get
@@ -163,6 +245,7 @@ public class AudioComponent : Component
             InternalCalls.Audio_SetDistortionLevel(entity, value);
         }
     }
+    #endregion
 
     // TODO more component stuff getter setter
 

@@ -8,9 +8,9 @@ layout(location = 0) in struct {
 
 layout (std140, push_constant) uniform PushConstants 
 {
-	vec4 world_eye_pos;
-	vec4 ambient_color;
-    vec2 viewport_size;
+	vec4 world_eye_pos; // Stores Diffuse Tint
+	vec4 ambient_color; // Stores Emissive Values
+    vec2 viewport_size; // Stores Glossiness / Roughness
     int user_param;
     int user_param2;
     int user_param3;
@@ -26,12 +26,14 @@ layout (location = 2) out vec4 outNormal;
 layout (location = 3) out vec4 outAmbient;
 layout (location = 4) out vec4 outRoughness;
 layout (location = 5) out vec4 outGlossiness;
+layout (location = 6) out vec4 outEmissive;
 
 layout (binding = 5) uniform sampler2D uDiffuseTexture;
 layout (binding = 6) uniform sampler2D uNormalTexture;
 layout (binding = 7) uniform sampler2D uAmbientTexture;
 layout (binding = 8) uniform sampler2D uRoughnessTexture;
 layout (binding = 9) uniform sampler2D uGlossinessTexture;
+layout (binding = 10) uniform sampler2D uEmissiveTexture;
 
 vec3 ToGamma(vec3 color)
 {
@@ -65,7 +67,7 @@ void main()
     vec3 tnorm = normalize(TBN * normal);
     outNormal = vec4(tnorm, 1.0);
 
-    vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
+    vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), 1.f);
 
 	outDiffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
 
@@ -74,5 +76,7 @@ void main()
     outRoughness = texture(uRoughnessTexture, In.UV) * pushConsts.viewport_size.y;
 
     outGlossiness = texture(uGlossinessTexture, In.UV) * pushConsts.viewport_size.x;
+
+    outEmissive = texture(uEmissiveTexture, In.UV) * vec4(ToGamma(pushConsts.ambient_color.rgb) * pushConsts.ambient_color.a, 1.f);
 }
 

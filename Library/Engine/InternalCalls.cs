@@ -406,6 +406,42 @@ public static class InternalCalls
     public static extern void Audio_SetStereo(ulong entity, bool value);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetMinDistance(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetMinDistance(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetMaxDistance(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetMaxDistance(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetFadeIn(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetFadeIn(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Audio_GetFadeOut(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetFadeOut(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetFadeInTimer(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetFadeInTimer(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetFadeOutTimer(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetFadeOutTimer(ulong entity, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool Audio_GetLPF(ulong entity);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
