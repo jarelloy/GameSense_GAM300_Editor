@@ -1,5 +1,6 @@
 #version 460
-
+#extension GL_GOOGLE_include_directive : enable
+#include "PBR.glsl"
 layout (location = 0) in vec2 inUV;
 
 struct PointLight
@@ -77,63 +78,71 @@ float ShadowCalculation(vec3 fragPos, int ls_index)
     return shadow;
 }
 
-vec3 ToGamma(vec3 color)
-{
-    return pow(color, vec3(2.20f));
-}
-
-float ToGamma(float value)
-{
-    return pow(value, 2.20f);
-}
-
 void main() 
 {
     vec4 finalColor = vec4(0, 0, 0, 0);
 
     // Read the diffuse color
-	vec4 DiffuseColor = texture(uDiffuseTexture, inUV);
+	vec3 albedo = texture(uDiffuseTexture, inUV).rgb;
     
     // Read normal
     vec3 normal = vec3(texture(uNormalTexture, inUV));
 
+    // Read position
     vec3 vertPos = vec3(texture(uPositionTexture, inUV));
 
-    const float Shininess = mix( 1, 100, 1 - ToGamma(texture( uRoughnessTexture, inUV).r) );
+    // Read metallic
+    float Metalness = texture(uGlossinessTexture, inUV).r;
 
-    vec3 glossiveness = ToGamma(texture(uGlossinessTexture, inUV).rgb);
+    // Read roughness
+    float roughness = 1.f - texture(uRoughnessTexture, inUV).r;
 
     // Viewer to fragment
-	vec3 EyeDirection = vertPos - pushConsts.world_eye_pos.xyz;
+	vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
 	EyeDirection = normalize(EyeDirection);
+
+    vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo.rgb, Metalness);
 
     for (int i = pushConsts.user_param; i < pushConsts.user_param + pushConsts.user_param2; ++i)
     {        
         // Point light color from gamma to linear
         vec3 light_color = pow(uniforms.point_light_list[i].color.rgb, vec3(2.20f));
 
-        // Vector to light
+        // calculate per-light radiance
 		vec3 LightDirection = uniforms.point_light_list[i].position - vertPos;
-		// Distance from light to fragment position
+        vec3 H = normalize(EyeDirection + LightDirection);
 		float dist = length(LightDirection);
-        LightDirection = normalize(LightDirection);
-
-	    // Compute the diffuse intensity
-	    float DiffuseI  = max( 0, dot(normal, LightDirection ));
-        vec3 ComputedDiffuse = uniforms.point_light_list[i].intensity * light_color * DiffuseI.rrr * DiffuseColor.rgb;
-
-        // Determine the power for the specular based on how rough something is
-        float SpecularI2  = pow( max( 0, dot(normal, normalize( LightDirection - EyeDirection ))), Shininess );
-        //vec3 reflectDir = reflect(-LightDirection, normal);  
-        //float SpecularI1  = pow( max( 0, dot(-EyeDirection, reflectDir)), Shininess );
-        vec3 ComputedSpecular = uniforms.point_light_list[i].intensity * light_color * SpecularI2.rrr * glossiveness;
-
-        // Attenuation
         float denom_atten = (dist / uniforms.point_light_list[i].radius) + 1.0;
         float Attenuation = 1.0 / (denom_atten * denom_atten);
+        vec3 radiance = uniforms.point_light_list[i].intensity * light_color * Attenuation;
 
-	    // Add the contribution of this light
-        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * ShadowCalculation(vertPos, i) * Attenuation;
+        // Cook-Torrance BRDF
+        float NDF = DistributionGGX(normal, H, roughness);   
+        float G   = GeometrySmith(normal, EyeDirection, LightDirection, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, EyeDirection), 0.0), F0);
+
+        vec3 numerator    = NDF * G * F; 
+        float denominator = 4.0 * max(dot(normal, EyeDirection), 0.0) * max(dot(normal, LightDirection), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+        vec3 specular = numerator / denominator;
+
+        // kS is equal to Fresnel
+        vec3 kS = F;
+        // for energy conservation, the diffuse and specular light can't
+        // be above 1.0 (unless the surface emits light); to preserve this
+        // relationship the diffuse component (kD) should equal 1.0 - kS.
+        vec3 kD = vec3(1.0) - kS;
+        // multiply kD by the inverse metalness such that only non-metals 
+        // have diffuse lighting, or a linear blend if partly metal (pure metals
+        // have no diffuse light).
+        kD *= 1.0 - Metalness;	  
+
+        // scale light by NdotL
+        float NdotL = max(dot(normal, LightDirection), 0.0);
+
+         // add to outgoing radiance
+        finalColor.rgb += (kD * albedo / PI + specular) * radiance * NdotL * ShadowCalculation(vertPos, i);  
+        // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
     outFragColor = finalColor;

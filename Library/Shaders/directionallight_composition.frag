@@ -95,6 +95,16 @@ float ShadowCalculation(vec3 fragPos, int ls_index)
 	return shadowFactor / count;
 }
 
+vec3 ToGamma(vec3 color)
+{
+    return pow(color, vec3(2.20f));
+}
+
+float ToGamma(float value)
+{
+    return pow(value, 2.20f);
+}
+
 void main() 
 {
     vec4 finalColor = vec4(0, 0, 0, 0);
@@ -106,6 +116,14 @@ void main()
     vec3 normal = vec3(texture(uNormalTexture, inUV));
 
     vec3 vertPos = vec3(texture(uPositionTexture, inUV));
+
+	const float Shininess = mix( 1, 100, 1 - ToGamma(texture( uRoughnessTexture, inUV).r) );
+
+    vec3 glossiveness = ToGamma(texture(uGlossinessTexture, inUV).rgb);
+
+	// Viewer to fragment
+	vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
+	EyeDirection = normalize(EyeDirection);
 
     for (int i = pushConsts.user_param; i < pushConsts.user_param + pushConsts.user_param2; ++i)
     {        
@@ -119,14 +137,9 @@ void main()
 	    float DiffuseI  = max( 0, dot(normal, LightDirection ));
         vec3 ComputedDiffuse = uniforms.directional_light_list[i].intensity * light_color * DiffuseI.rrr * DiffuseColor.rgb;
 
-        // Viewer to fragment
-		vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
-		EyeDirection = normalize(EyeDirection);
-
         // Determine the power for the specular based on how rough something is
-        const float Shininess = mix( 1, 100, 1 - texture( uRoughnessTexture, inUV).r );
         float SpecularI2  = pow( max( 0, dot(normal, normalize( LightDirection - EyeDirection ))), Shininess );
-        vec3 ComputedSpecular = uniforms.directional_light_list[i].intensity * light_color * SpecularI2.rrr * texture(uGlossinessTexture, inUV).rgb;
+        vec3 ComputedSpecular = uniforms.directional_light_list[i].intensity * light_color * SpecularI2.rrr * glossiveness;
 
 	    // Add the contribution of this light
         finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * ShadowCalculation(vertPos, i);
