@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 public class RigidBody : Component
 {
+    public bool enabled
+    {
+        get
+        {
+            return InternalCalls.Rigidbody_GetEnabled(entity);
+        }
+        set
+        {
+            InternalCalls.Rigidbody_EnableDisable(entity, value);
+        }
+    }
+
     public float mass
     {
         get

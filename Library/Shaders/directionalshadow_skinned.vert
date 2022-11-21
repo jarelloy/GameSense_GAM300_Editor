@@ -33,6 +33,7 @@ struct DirectionalLight
     vec4 color;
     float intensity;
     float far_plane;
+    int cast_shadows;
     mat4 viewMatrix;
 };
 

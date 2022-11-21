@@ -405,10 +405,9 @@ public enum LeftAlignment
 
 public enum SOUND_GROUP
 {
-    SFX = 0,
-	MUSIC = 1,
-    STEREO = 2,
-    MASTER = 3
+    BGM = 0,
+    SFX,
+    MASTER
 };
     
 public enum EQ_GROUP

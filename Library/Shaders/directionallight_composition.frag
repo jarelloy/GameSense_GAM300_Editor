@@ -35,6 +35,7 @@ struct DirectionalLight
     vec4 color;
     float intensity;
     float far_plane;
+	int cast_shadows;
     mat4 viewMatrix;
 };
 
@@ -95,12 +96,12 @@ float ShadowCalculation(vec3 fragPos, int ls_index)
 	return shadowFactor / count;
 }
 
-vec3 ToGamma(vec3 color)
+vec3 ToLinear(vec3 color)
 {
     return pow(color, vec3(2.20f));
 }
 
-float ToGamma(float value)
+float ToLinear(float value)
 {
     return pow(value, 2.20f);
 }
@@ -117,9 +118,9 @@ void main()
 
     vec3 vertPos = vec3(texture(uPositionTexture, inUV));
 
-	const float Shininess = mix( 1, 100, 1 - ToGamma(texture( uRoughnessTexture, inUV).r) );
+	const float Shininess = mix( 1, 100, 1 - ToLinear(texture( uRoughnessTexture, inUV).r) );
 
-    vec3 glossiveness = ToGamma(texture(uGlossinessTexture, inUV).rgb);
+    vec3 glossiveness = ToLinear(texture(uGlossinessTexture, inUV).rgb);
 
 	// Viewer to fragment
 	vec3 EyeDirection = pushConsts.world_eye_pos.xyz - vertPos;
@@ -142,7 +143,8 @@ void main()
         vec3 ComputedSpecular = uniforms.directional_light_list[i].intensity * light_color * SpecularI2.rrr * glossiveness;
 
 	    // Add the contribution of this light
-        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * ShadowCalculation(vertPos, i);
+        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * 
+		(uniforms.directional_light_list[i].cast_shadows == 1 ? ShadowCalculation(vertPos, i) : 1.f);
     }
 
     outFragColor = finalColor;

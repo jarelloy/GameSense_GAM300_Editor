@@ -89,6 +89,11 @@ public class GameObject
         return InternalCalls.HasComponent_Native(ent, typeof(T));
     }
 
+    public int GetComponentsCount<T>() where T : Component, new()
+    {
+        return InternalCalls.GetComponentsCount_Native(ID, typeof(T));
+    }
+
     public T AddComponent<T>() where T : Component, new()
     {
         if (!HasComponent<T>())
@@ -96,12 +101,17 @@ public class GameObject
             InternalCalls.AddComponent_Native(ID, typeof(T));
             T component = new T();
             component.entity = ID;
+
+            // index of newly added component via script would have index of current count
+            component.index = GetComponentsCount<T>();
+
             return component;
         }
         return null;
     }
 
-    public T AddComponent<T>(ulong ent) where T : Component, new()
+    // disabling for now as im not seeing its use yet
+    /*public T AddComponent<T>(ulong ent) where T : Component, new()
     {
         if (!HasComponent<T>(ent))
         {
@@ -113,31 +123,42 @@ public class GameObject
             return component;
         }
         return null;
-    }
+    }*/
 
-    public T GetComponent<T>() where T : Component, new()
+    public T GetComponent<T>(int idx = 0) where T : Component, new()
     {
         if (HasComponent<T>())
         {
-            T component = new T();
-            component.entity = ID;
-            return component;
+            // index boundary check
+            if (idx >= GetComponentsCount<T>())
+            {
+                throw new IndexOutOfRangeException("Component index out of range!");
+            }
+            else
+            {
+                T component = new T();
+                component.entity = ID;
+                component.index = idx;
+                return component;
+            }
         }
         return null;
     }
 
-    public T GetComponent<T>(ulong ent) where T : Component, new()
+    // disabling as its params are conflicting with above get component function
+    /*public T GetComponent<T>(ulong ent, int idx = 0) where T : Component, new()
     {
         if (HasComponent<T>(ent))
         {
             T component = new T()
             {
-                entity = ent
+                entity = ent,
+                index = idx
             };
             return component;
         }
         return null;
-    }
+    }*/
 
     public Transform transform
     {

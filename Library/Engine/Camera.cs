@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 public class Camera : Component
 {
+    public bool enabled
+    {
+        get
+        {
+            return InternalCalls.Camera_GetEnabled(entity);
+        }
+        set
+        {
+            InternalCalls.Camera_EnableDisable(entity, value);
+        }
+    }
+
     public Vector2 viewPortSize
     {
         get

@@ -22,11 +22,20 @@ layout (location = 0) out vec4 outDiffuse;
 
 layout (binding = 7) uniform sampler2D uDiffuseTexture;
 
+vec3 ToGamma(vec3 color)
+{
+    return pow(color, vec3(1.0 / 2.20f));
+}
+
+vec3 ToLinear(vec3 color)
+{
+    return pow(color, vec3(2.20f));
+}
+
 void main() 
 {
     // Read the texture colors
-    vec4 color = In.Color * texture(uDiffuseTexture, In.UV);
-    const float Gamma = pushConsts.world_eye_pos.w;
-	outDiffuse = vec4(pow(color.rgb, vec3(1.0f/Gamma)), color.a);;
+	outDiffuse = In.Color * texture(uDiffuseTexture, In.UV);
+    //outDiffuse = vec4(ToLinear(outDiffuse.rgb), outDiffuse.a);
 }
 

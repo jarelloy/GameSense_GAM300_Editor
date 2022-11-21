@@ -22,18 +22,16 @@ layout (location = 0) out vec4 outDiffuse;
 
 layout (binding = 5) uniform sampler2D uDiffuseTexture;
 
-vec3 ToGamma(vec3 color)
+vec3 ToLinear(vec3 color)
 {
     return pow(color, vec3(2.20f));
 }
 
 void main() 
 {
-    vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
+    vec4 diffuseTint = vec4(ToLinear(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
 
     // Read the texture colors
-    const float Gamma = pushConsts.ambient_color.w;
-    vec4 diffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
-	outDiffuse = vec4(pow(diffuse.rgb, vec3(1.0f/Gamma)), diffuse.a);
+	outDiffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
 }
 

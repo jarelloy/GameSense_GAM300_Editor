@@ -23,12 +23,15 @@ layout (location = 0) out vec4 outFragColor;
 
 layout (binding = 5) uniform sampler2D uDiffuseTexture;
 
+vec3 ToLinear(vec3 color)
+{
+    return pow(color, vec3(2.20f));
+}
+
 void main() 
 {
-    const float Gamma = pushConsts.world_eye_pos.w;
-	vec4 color = texture(uDiffuseTexture, In.UV) * pushConsts.color;
-
     // Read the texture colors
-	outFragColor = vec4(pow(color.rgb, vec3(1.0f/Gamma)), color.a);
+	outFragColor = texture(uDiffuseTexture, In.UV);
+	outFragColor = vec4(outFragColor.rgb * ToLinear(pushConsts.color.rgb), outFragColor.a * pushConsts.color.a);
 }
 

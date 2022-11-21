@@ -24,7 +24,6 @@ layout (location = 0) out vec4 outFragColor;
 
 void main() 
 {
-    const float Gamma = pushConsts.world_eye_pos.w;
-    outFragColor = vec4(pow(In.VertColor.rgb, vec3(1.0f/Gamma)), In.VertColor.a);
+    outFragColor = In.VertColor;
 }
 

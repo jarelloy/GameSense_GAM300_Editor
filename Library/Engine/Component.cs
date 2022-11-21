@@ -16,4 +16,5 @@ public abstract class Component
     }
 
     public ulong entity;
+    public int index;
 }

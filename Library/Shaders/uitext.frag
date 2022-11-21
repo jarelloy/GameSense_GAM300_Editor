@@ -13,6 +13,7 @@ void main()
 {
     // Read the texture colors
     float alpha = texture(uDiffuseTexture, In.UV).r;
-	outFragColor = vec4(1.f, 1.f, 1.f, alpha) * In.Color;
+
+	outFragColor = vec4(1.f, 1.f, 1.f, alpha) * vec4(pow(In.Color.rgb, vec3(2.20f)), In.Color.a);
 }
 

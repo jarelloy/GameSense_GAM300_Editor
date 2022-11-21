@@ -9,6 +9,7 @@ struct PointLight
     float intensity;
     float radius;
     float far_plane;
+    int cast_shadows;
 };
 
 layout (std140, push_constant) uniform PushConstants 
@@ -77,12 +78,12 @@ float ShadowCalculation(vec3 fragPos, int ls_index)
     return shadow;
 }
 
-vec3 ToGamma(vec3 color)
+vec3 ToLinear(vec3 color)
 {
     return pow(color, vec3(2.20f));
 }
 
-float ToGamma(float value)
+float ToLinear(float value)
 {
     return pow(value, 2.20f);
 }
@@ -99,9 +100,9 @@ void main()
 
     vec3 vertPos = vec3(texture(uPositionTexture, inUV));
 
-    const float Shininess = mix( 1, 100, 1 - ToGamma(texture( uRoughnessTexture, inUV).r) );
+    const float Shininess = mix( 1, 100, 1 - ToLinear(texture( uRoughnessTexture, inUV).r) );
 
-    vec3 glossiveness = ToGamma(texture(uGlossinessTexture, inUV).rgb);
+    vec3 glossiveness = ToLinear(texture(uGlossinessTexture, inUV).rgb);
 
     // Viewer to fragment
 	vec3 EyeDirection = vertPos - pushConsts.world_eye_pos.xyz;
@@ -133,7 +134,9 @@ void main()
         float Attenuation = 1.0 / (denom_atten * denom_atten);
 
 	    // Add the contribution of this light
-        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * ShadowCalculation(vertPos, i) * Attenuation;
+        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * 
+        (uniforms.point_light_list[i].cast_shadows == 1 ? ShadowCalculation(vertPos, i) : 1.f) * 
+        Attenuation;
     }
 
     outFragColor = finalColor;

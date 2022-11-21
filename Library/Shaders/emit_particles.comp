@@ -231,13 +231,13 @@ vec2 randomUnitVec2(float angle)
 	return vec2(cos(pi), sin(pi));
 }
 
-vec3 randomUnitVec3()
+vec3 randomUnitVec3(float angle)
 {
 	uint index = gl_GlobalInvocationID.x;
 	seeds = seeds.zxy;
 
 	float z = (2.0 * RandomFloatBtwn(0.0, 1.0)) - 1.0;
-	vec2 planar = randomUnitVec2(PI * 2.0) * sqrt(1.0 - z * z);
+	vec2 planar = randomUnitVec2(angle) * sqrt(1.0 - z * z);
 	return vec3(planar, z);
 }
 
@@ -336,7 +336,7 @@ void InitSphere(out vec3 position, out vec3 velocity, out vec3 spherized_dir)
 	float radius = ParticleEngine.m_Shape.m_Radius;
 	position = vec3(0.0);
 
-	vec3 directionToTravel = randomUnitVec3();
+	vec3 directionToTravel = randomUnitVec3(ToRadians(ParticleEngine.m_Shape.m_Arc));
 	position += directionToTravel * RandomFloatBtwn(1.0 - ParticleEngine.m_Shape.m_RadiusThickness, 1.0) * radius;
 
 	velocity = directionToTravel;
@@ -467,7 +467,7 @@ void main()
 			if (ParticleEngine.m_Shape.m_RandomizeDirection > 0.0)
 			{
 				float weight = ParticleEngine.m_Shape.m_RandomizeDirection;
-				vec3 randomDir = randomUnitVec3();
+				vec3 randomDir = randomUnitVec3(PI * 2.0);
 				final_velocity = final_velocity * (1.0 - weight) + randomDir * weight;
 			}
 
@@ -532,7 +532,7 @@ void main()
 			// Randomize Position
 			if (ParticleEngine.m_Shape.m_RandomizePosition > 0.0)
 			{
-				final_position += randomUnitVec3() * ParticleEngine.m_Shape.m_RandomizePosition;
+				final_position += randomUnitVec3(PI * 2.0) * ParticleEngine.m_Shape.m_RandomizePosition;
 			}
 
 			particle.m_Position = final_position;
