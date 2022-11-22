@@ -85,16 +85,16 @@ public class Transform : Component
 
     public void Translate(Vector3 translation)
     {
-        InternalCalls.Transform_Translate(entity, ref translation);
+        InternalCalls.Transform_Translate(entity, ref translation, isGlobalTransform);
     }
 
     public void Rotate(Vector3 rotation)
     {
-        InternalCalls.Transform_Rotate(entity, ref rotation);
+        InternalCalls.Transform_Rotate(entity, ref rotation, isGlobalTransform);
     }
 
     public void ScaleUp(Vector3 scale)
     {
-        InternalCalls.Transform_ScaleUp(entity, ref scale);
+        InternalCalls.Transform_ScaleUp(entity, ref scale, isGlobalTransform);
     }
 }

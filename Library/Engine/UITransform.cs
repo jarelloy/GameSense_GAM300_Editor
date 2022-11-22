@@ -72,16 +72,16 @@ public class UITransform : Component
 
     public void Translate(Vector3 translation)
     {
-        InternalCalls.UITransform_Translate(entity, ref translation);
+        InternalCalls.UITransform_Translate(entity, ref translation, isGlobalUITransform);
     }
 
     public void Rotate(Vector3 rotation)
     {
-        InternalCalls.UITransform_Rotate(entity, ref rotation);
+        InternalCalls.UITransform_Rotate(entity, ref rotation, isGlobalUITransform);
     }
 
     public void ScaleUp(Vector3 scale)
     {
-        InternalCalls.UITransform_ScaleUp(entity, ref scale);
+        InternalCalls.UITransform_ScaleUp(entity, ref scale, isGlobalUITransform);
     }
 }

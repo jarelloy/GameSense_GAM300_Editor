@@ -36,6 +36,5 @@ void main()
 {
     // Read the texture colors
 	outDiffuse = In.Color * texture(uDiffuseTexture, In.UV);
-    //outDiffuse = vec4(ToLinear(outDiffuse.rgb), outDiffuse.a);
 }
 

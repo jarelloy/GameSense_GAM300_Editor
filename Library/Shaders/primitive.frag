@@ -22,6 +22,11 @@ layout (binding = 3) uniform sampler2D uDepthTexture;
 
 layout (location = 0) out vec4 outFragColor;
 
+vec3 ToGamma(vec3 color)
+{
+    return pow(color, vec3(1.0f / 2.20f));
+}
+
 void main() 
 {
     outFragColor = In.VertColor;

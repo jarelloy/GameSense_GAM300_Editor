@@ -50,7 +50,7 @@ struct ColorGrading
 struct Vignette
 {
 	int m_Enabled;
-	vec3 m_Color;
+	vec4 m_Color;
 	vec2 m_Center; // 0 - 1
 	float m_Intensity;
 	float m_Smoothness;
@@ -160,6 +160,42 @@ vec3 ApplyColorGrading(vec3 color)
     return color;
 }
 
+vec3 ApplyVignette(vec3 color)
+{
+	if (pp_buffer.m_Enabled == 1 && pp_buffer.m_Vignette.m_Enabled == 1)
+    {
+		// Rounded: * aspect ratio (x, y)
+
+		float roundness = 0.1 + (pp_buffer.m_Vignette.m_Roundness) * (0.9);
+		float intensity = min(pp_buffer.m_Vignette.m_Intensity, 0.99);
+		float smoothness = min(pp_buffer.m_Vignette.m_Smoothness, 0.99);
+		vec2 offset = pp_buffer.m_Vignette.m_Center - vec2(0.5);
+
+		// Maps 0 to 1 -> -0.5 to 0.5 + offset
+		vec2 uv = inUV - 0.5 + vec2(-offset.x, offset.y);
+
+		if (pp_buffer.m_Vignette.m_Rounded == 1)
+		{
+			float aspect_ratio = pushConsts.viewport_size.x / pushConsts.viewport_size.y;
+			if (pushConsts.viewport_size.x > pushConsts.viewport_size.y)
+				uv.x *= aspect_ratio;
+			else
+				uv.y *= (1.0 / aspect_ratio);
+		}
+
+		//Calculate edge curvature
+		vec2 curve = pow(abs(uv), vec2(1.0 / roundness));
+		//Compute distance to edge
+		float edge = pow(length(curve), roundness);
+
+		float outerRadius = (1.0 - intensity);
+		float innerRadius = outerRadius * smoothness;
+		float vignette = smoothstep(outerRadius, innerRadius, edge) * pp_buffer.m_Vignette.m_Color.a;
+		color = mix(color, pp_buffer.m_Vignette.m_Color.rgb, 1.0 - vignette);
+	}
+	return color;
+}
+
 void main() 
 {
 	vec4 hdrColor4 = texture(uFinalTexture, inUV);
@@ -167,18 +203,19 @@ void main()
 
 	hdrColor = ApplyBloom(hdrColor);
 	
-    const float Gamma = pushConsts.viewport_size.y;
-    const float Exposure = pushConsts.viewport_size.x;
+    const float Gamma = pushConsts.world_eye_pos.w;
+    const float Exposure = pushConsts.world_eye_pos.x;
 
 	// HDR to RGBUNORM
   
     // exposure tone mapping
-    //vec3 color = vec3(1.0) - exp(-hdrColor * Exposure);
+    vec3 color = vec3(1.0) - exp(-hdrColor * Exposure);
 
     // gamma correction 
-    vec3 color = pow(hdrColor, vec3(1.0 / Gamma));
+    color = pow(hdrColor, vec3(1.0 / Gamma));
 
     color = ApplyColorGrading(color);
+    color = ApplyVignette(color);
   
 	outFragColor = vec4(color, hdrColor4.a);
 }

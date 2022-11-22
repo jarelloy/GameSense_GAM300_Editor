@@ -97,6 +97,13 @@ public static class InternalCalls
 
     #endregion
 
+    #region Physics
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Physics_Raycast(ref Vector3 inraypos, ref Vector3 inraydir, float raylength, out ulong entityHit, out Vector3 hitpos, out Vector3 hitnormal);
+
+    #endregion
+
     #region SceneManager
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -144,6 +151,62 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool IsDTPaused();
+
+    #endregion
+
+    #region Graphics
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Graphics_GetAmbientIntensity();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Graphics_SetAmbientIntensity(float ambientIntensity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Graphics_GetAmbientColor(out Vector3 ambientColor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Graphics_GetAmbientColor(ref Vector3 ambientColor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Graphics_GetGamma();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Graphics_SetGamma(float gamma);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Graphics_GetExposure();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Graphics_SetExposure(float exposure);
+
+    #endregion
+
+    #region PostProcessing
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int PostProcessing_GetEnabled();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_SetEnabled(int value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_GetColorGrading(out ColorGrading bloom);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_SetColorGrading(ref ColorGrading bloom);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_GetBloom(out Bloom bloom);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_SetBloom(ref Bloom bloom);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_GetVignette(out Vignette bloom);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PostProcessing_SetVignette(ref Vignette bloom);
 
     #endregion
 
@@ -366,13 +429,13 @@ public static class InternalCalls
     internal static extern void UITransform_SetScale(ulong entity, ref Vector3 inScale, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void UITransform_Translate(ulong entity, ref Vector3 inTranslation);
+    internal static extern void UITransform_Translate(ulong entity, ref Vector3 inTranslation, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void UITransform_Rotate(ulong entity, ref Vector3 inRotate);
+    internal static extern void UITransform_Rotate(ulong entity, ref Vector3 inRotate, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void UITransform_ScaleUp(ulong entity, ref Vector3 inScale);
+    internal static extern void UITransform_ScaleUp(ulong entity, ref Vector3 inScale, bool isGlobal);
     #endregion
 
     #region Transform
@@ -406,13 +469,13 @@ public static class InternalCalls
     */
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_Translate(ulong entity, ref Vector3 inTranslation);
+    internal static extern void Transform_Translate(ulong entity, ref Vector3 inTranslation, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_Rotate(ulong entity, ref Vector3 inRotate);
+    internal static extern void Transform_Rotate(ulong entity, ref Vector3 inRotate, bool isGlobal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Transform_ScaleUp(ulong entity, ref Vector3 inScale);
+    internal static extern void Transform_ScaleUp(ulong entity, ref Vector3 inScale, bool isGlobal);
     #endregion
 
     #region Debug
