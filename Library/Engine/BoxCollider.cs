@@ -17,4 +17,17 @@ public class BoxCollider : Component
             InternalCalls.BoxCollider_EnableDisable(entity, index, value);
         }
     }
+
+    public Vector3 size
+    {
+        get
+        {
+            InternalCalls.BoxCollider_GetHalfExtents(entity, index, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            InternalCalls.BoxCollider_SetHalfExtents(entity, index, ref value);
+        }
+    }
 }

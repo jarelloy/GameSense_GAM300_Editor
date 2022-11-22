@@ -17,4 +17,28 @@ public class CapsuleCollider : Component
             InternalCalls.CapsuleCollider_EnableDisable(entity, index, value);
         }
     }
+
+    public float height
+    {
+        get
+        {
+            return InternalCalls.CapsuleCollider_GetHalfHeights(entity, index);
+        }
+        set
+        {
+            InternalCalls.CapsuleCollider_SetHalfHeights(entity, index, value);
+        }
+    }
+
+    public float radius
+    {
+        get
+        {
+            return InternalCalls.CapsuleCollider_GetRadius(entity, index);
+        }
+        set
+        {
+            InternalCalls.CapsuleCollider_SetRadius(entity, index, value);
+        }
+    }
 }

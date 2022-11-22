@@ -7,6 +7,16 @@ using System.Threading.Tasks;
 
 public static class InternalCalls
 {
+    #region Mesh
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Mesh_EnableDisable(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Mesh_GetEnabled(ulong entity);
+
+    #endregion
+
     #region Particles
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -34,6 +44,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool BoxCollider_GetEnabled(ulong entity, int index);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void BoxCollider_GetHalfExtents(ulong entity, int index, out Vector3 outvec3);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void BoxCollider_SetHalfExtents(ulong entity, int index, ref Vector3 invec3);
+
     #endregion
 
     #region CapsuleCollider
@@ -44,6 +60,18 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool CapsuleCollider_GetEnabled(ulong entity, int index);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float CapsuleCollider_GetRadius(ulong entity, int index);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CapsuleCollider_SetRadius(ulong entity, int index, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float CapsuleCollider_GetHalfHeights(ulong entity, int index);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CapsuleCollider_SetHalfHeights(ulong entity, int index, float value);
+
     #endregion
 
     #region SphereCollider
@@ -53,6 +81,12 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool SphereCollider_GetEnabled(ulong entity, int index);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float SphereCollider_GetRadius(ulong entity, int index);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SphereCollider_SetRadius(ulong entity, int index, float value);
 
     #endregion
 
@@ -166,7 +200,7 @@ public static class InternalCalls
     internal static extern void Graphics_GetAmbientColor(out Vector3 ambientColor);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    internal static extern void Graphics_GetAmbientColor(ref Vector3 ambientColor);
+    internal static extern void Graphics_SetAmbientColor(ref Vector3 ambientColor);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern float Graphics_GetGamma();

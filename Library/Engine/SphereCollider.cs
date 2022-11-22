@@ -17,4 +17,16 @@ public class SphereCollider : Component
             InternalCalls.SphereCollider_EnableDisable(entity, index, value);
         }
     }
+
+    public float radius
+    {
+        get
+        {
+            return InternalCalls.SphereCollider_GetRadius(entity, index);
+        }
+        set
+        {
+            InternalCalls.SphereCollider_SetRadius(entity, index, value);
+        }
+    }
 }
