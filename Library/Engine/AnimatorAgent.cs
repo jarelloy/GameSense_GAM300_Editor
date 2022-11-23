@@ -48,8 +48,23 @@ public class AnimatorAgent : Component
         InternalCalls.Animator_ResetTrigger(entity, conditionName);
     }
 
-    public void PlayAnim(string stateName)
+    public void PlayAnimState(string stateName)
     {
         InternalCalls.Animator_PlayAnim(entity, stateName);
+    }
+
+    public void Pause()
+    {
+        InternalCalls.Animator_Pause(entity);
+    }
+
+    public void Stop()
+    {
+        InternalCalls.Animator_Stop(entity);
+    }
+
+    public void Play()
+    {
+        InternalCalls.Animator_Play(entity);
     }
 }

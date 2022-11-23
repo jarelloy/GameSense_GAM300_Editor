@@ -129,6 +129,15 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Animator_PlayAnim(ulong entity, string name);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Animator_Pause(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Animator_Stop(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Animator_Play(ulong entity);
+
     #endregion
 
     #region Physics
@@ -317,6 +326,38 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Camera_SetFieldOfView(ulong entity, float value);
+
+    #endregion
+
+    #region UIImage
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UIImage_GetEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_SetEnabled(ulong entity, bool inenabled);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_GetColor(ulong entity, out Vector4 outcolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_SetColor(ulong entity, ref Vector4 incolor);
+
+    #endregion
+
+    #region TextObject
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool TextObject_GetEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void TextObject_SetEnabled(ulong entity, bool inenabled);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void TextObject_GetColor(ulong entity, out Vector4 outcolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void TextObject_SetColor(ulong entity, ref Vector4 incolor);
 
     #endregion
 
