@@ -97,4 +97,22 @@ public class Transform : Component
     {
         InternalCalls.Transform_ScaleUp(entity, ref scale, isGlobalTransform);
     }
+
+    public Vector3 GetForward()
+    {
+        InternalCalls.Transform_GetForward(entity, out Vector3 forward, isGlobalTransform);
+        return forward;
+    }
+
+    public Vector3 GetUp()
+    {
+        InternalCalls.Transform_GetUp(entity, out Vector3 up, isGlobalTransform);
+        return up;
+    }
+
+    public Vector3 GetRight()
+    {
+        InternalCalls.Transform_GetRight(entity, out Vector3 right, isGlobalTransform);
+        return right;
+    }
 }

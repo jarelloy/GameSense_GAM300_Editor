@@ -491,6 +491,14 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Transform_SetScale(ulong entity, ref Vector3 inScale,  bool isGlobal);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Transform_GetForward(ulong entity, out Vector3 forward, bool isGlobal);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Transform_GetUp(ulong entity, out Vector3 up, bool isGlobal);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Transform_GetRight(ulong entity, out Vector3 right, bool isGlobal);
     /*
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern string GetTransformZDepth_Native(ulong entity);
