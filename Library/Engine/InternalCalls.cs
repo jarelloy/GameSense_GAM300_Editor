@@ -195,6 +195,15 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern bool IsDTPaused();
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Time_GetUnscaledDeltaTime();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Time_GetTimeScale();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Time_SetTimeScale(float scale);
+
     #endregion
 
     #region Graphics

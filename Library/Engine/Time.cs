@@ -21,6 +21,24 @@ public static class Time
             return 0.02f;
         }
     }
+    public static float unscaledDeltaTime
+    {
+        get
+        {
+            return InternalCalls.Time_GetUnscaledDeltaTime();
+        }
+    }
+    public static float timeScale
+    {
+        get
+        {
+            return InternalCalls.Time_GetTimeScale();
+        }
+        set
+        {
+            InternalCalls.Time_SetTimeScale(value);
+        }
+    }
     public static int fps
     {
         get
