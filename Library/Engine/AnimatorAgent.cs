@@ -10,7 +10,7 @@ public class AnimatorAgent : Component
     {
         get
         {
-            return InternalCalls.Rigidbody_GetEnabled(entity);
+            return InternalCalls.Animator_GetEnabled(entity);
         }
         set
         {

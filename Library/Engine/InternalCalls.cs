@@ -568,6 +568,22 @@ public static class InternalCalls
 
     #endregion
 
+    #region Window
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Window_GetWidth();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Window_GetHeight();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Window_GetCursorVisibility();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Window_SetCursorVisibility(bool visible);
+
+    #endregion
+
     #region Input
 
     [MethodImpl(MethodImplOptions.InternalCall)]
