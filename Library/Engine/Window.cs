@@ -32,4 +32,16 @@ public static class Window
             InternalCalls.Window_SetCursorVisibility(value);
         }
     }
+    public static void LockCursor(Vector2Int position)
+    {
+        InternalCalls.Window_LockCursor(ref position);
+    }
+    public static void UnlockCursor()
+    {
+        InternalCalls.Window_UnlockCursor();
+    }
+    public static bool IsCursorLocked()
+    {
+        return InternalCalls.Window_IsCursorLocked();
+    }
 }

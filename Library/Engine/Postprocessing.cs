@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 [StructLayout(LayoutKind.Sequential)]
 public struct ColorGrading
 {
-    public int enabled;
+    public bool enabled;
     public float temperature;
     public float temperatureFactor;
     public float tint;
     public float tintFactor;
-    public Vector3 PADDING;
-    public Vector4 colorFilter;
+    public Vector3 colorFilter;
     public float hueShift;
     public float saturation;
     public float brightness;
@@ -24,7 +23,7 @@ public struct ColorGrading
 [StructLayout(LayoutKind.Sequential)]
 public struct Bloom
 {
-    public int enabled;
+    public bool enabled;
     public float intensity;
     public float threshold;
     public float softknee;
@@ -33,21 +32,19 @@ public struct Bloom
     public float anamorphicRatio;
     public float blurScale;
     public float blurStrength;
-    public Vector3 PADDING;
     public Vector3 color;
 }
 
 [StructLayout(LayoutKind.Sequential)]
 public struct Vignette
 {
-    public int enabled;
-    public Vector3 PADDING;
+    public bool enabled;
     public Vector4 color;
     public Vector2 center;
     public float intensity;
     public float smoothness;
     public float roundness;
-    public int rounded;
+    public bool rounded;
 }
 
 public static class Graphics

@@ -53,6 +53,11 @@ public class AnimatorAgent : Component
         InternalCalls.Animator_PlayAnim(entity, stateName);
     }
 
+    public void SetAnimSpeed(string stateName, float speed)
+    {
+        InternalCalls.Animator_SetAnimStateSpeed(entity, stateName, speed);
+    }
+
     public void Pause()
     {
         InternalCalls.Animator_Pause(entity);

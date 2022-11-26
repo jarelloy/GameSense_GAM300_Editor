@@ -29,6 +29,9 @@ public static class InternalCalls
     public static extern void Particle_Restart(ulong entity);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Particle_Burst(ulong entity, int count, float probability);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Particle_EnableDisabled(ulong entity, bool value);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -137,6 +140,9 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Animator_Play(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Animator_SetAnimStateSpeed(ulong entity, string stateName, float speed);
 
     #endregion
 
@@ -591,6 +597,15 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Window_SetCursorVisibility(bool visible);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Window_LockCursor(ref Vector2Int position);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Window_UnlockCursor();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Window_IsCursorLocked();
+
     #endregion
 
     #region Input
@@ -633,6 +648,12 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern int Input_GetMouseY();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Input_GetMouseXDelta();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int Input_GetMouseYDelta();
 
     #endregion
 

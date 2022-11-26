@@ -32,4 +32,9 @@ public class ParticleEngine : Component
     {
         InternalCalls.Particle_Restart(entity);
     }
+
+    public void Burst(int count, float probability = 1.0f)
+    {
+        InternalCalls.Particle_Burst(entity, count, probability);
+    }
 }

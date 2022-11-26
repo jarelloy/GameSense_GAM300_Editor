@@ -58,6 +58,14 @@ public static class Input
         }
     }
 
+    public static Vector2Int mouseDelta
+    {
+        get
+        {
+            return new Vector2Int(InternalCalls.Input_GetMouseXDelta(), InternalCalls.Input_GetMouseYDelta());
+        }
+    }
+
     public static int mouseScrollDelta
     {
         get
@@ -75,6 +83,17 @@ public static class Input
     {
         return InternalCalls.Input_GetMouseY();
     }
+
+    public static int GetMouseXDelta()
+    {
+        return InternalCalls.Input_GetMouseXDelta();
+    }
+
+    public static int GetMouseYDelta()
+    {
+        return InternalCalls.Input_GetMouseYDelta();
+    }
+
     public static bool GetMouseButtonTriggered(int key)
     {
         switch (key)
