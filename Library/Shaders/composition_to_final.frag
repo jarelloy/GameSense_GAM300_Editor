@@ -212,7 +212,7 @@ void main()
     vec3 color = vec3(1.0) - exp(-hdrColor * Exposure);
 
     // gamma correction 
-    color = pow(hdrColor, vec3(1.0 / Gamma));
+    color = pow(color, vec3(1.0 / Gamma));
 
     color = ApplyColorGrading(color);
     color = ApplyVignette(color);
