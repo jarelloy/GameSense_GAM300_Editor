@@ -142,7 +142,36 @@ public class GameObject
                 return component;
             }
         }
+
         return null;
+    }
+
+    public bool HasScriptComponent<T>()
+    {
+        // send name of script to script system to check
+        string scriptName = typeof(T).ToString();
+        return InternalCalls.HasScriptComponent_Native(ID, scriptName);
+    }
+
+    public T GetScriptComponent<T>()
+    {
+        if (HasScriptComponent<T>())
+        {
+            // return reference of the instance of the script component
+            string scriptName = typeof(T).ToString();
+            object scriptObj = InternalCalls.GetScriptComponent_Native(ID, scriptName);
+            return (T)scriptObj;
+        }
+
+        return default(T);
+    }
+
+    public static T GetGlobalScriptComponent<T>()
+    {
+        // return reference of the instance of the script component
+        string scriptName = typeof(T).ToString();
+        object scriptObj = InternalCalls.GetGlobalScriptComponent_Native(scriptName);
+        return (T)scriptObj;
     }
 
     // disabling as its params are conflicting with above get component function
@@ -168,10 +197,22 @@ public class GameObject
         }
     }
 
-    public static GameObject Instantiate(string name = "")//, bool isUI = false)
+    public static GameObject Instantiate(GameObject original)
     {
-        ulong id = InternalCalls.CreateEntity_Native(name);
+        ulong id = InternalCalls.CreateEntity_Native(original != null ? original.ID : 0);
         return new GameObject(id);
+    }
+
+    public static GameObject InstantiateUI(GameObject original)
+    {
+        ulong id = InternalCalls.CreateEntityUI_Native(original != null ? original.ID : 0);
+        return new GameObject(id);
+    }
+
+    public static GameObject InstantiatePrefab(string prefab)//, bool isUI = false)
+    {
+        ulong id = InternalCalls.CreateEntityPrefab_Native(prefab);
+        return id == 0 ? null : new GameObject(id);
     }
 
     public static void Destroy(GameObject obj)

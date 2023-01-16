@@ -660,7 +660,13 @@ public static class InternalCalls
     #region GameObject
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern ulong CreateEntity_Native(string name);
+    public static extern ulong CreateEntity_Native(ulong id);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong CreateEntityUI_Native(ulong id);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong CreateEntityPrefab_Native(string prefab);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void DestroyEntity_Native(ulong entity);
@@ -690,7 +696,13 @@ public static class InternalCalls
     public static extern bool AddComponent_Native(ulong entity, Type type);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void AddTransform_Native(ulong entity);
+    public static extern bool HasScriptComponent_Native(ulong entity, string scriptName);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern object GetScriptComponent_Native(ulong entity, string scriptName);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern object GetGlobalScriptComponent_Native(string scriptName);
 
     #endregion
 
@@ -839,6 +851,116 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Audio_SetDistortionLevel(ulong entity, int index, float value);
+
+    #endregion
+
+    #region Material
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_EnableDisable(ulong entity, bool value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Material_GetEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong Material_GetMaterialAsset(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetMaterialAsset(ulong entity, ulong material_id);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Material_GetOverwriteMaterialReference(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetOverwriteMaterialReference(ulong entity, bool overwrite);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_GetDiffuseTint(ulong entity, out Vector4 diffuse);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetDiffuseTint(ulong entity, ref Vector4 diffuse);
+
+	[MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Material_GetGlossiness(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetGlossiness(ulong entity, float glossiness);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Material_GetSpecular(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetSpecular(ulong entity, float specular);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Material_GetEmissionEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetEmissionEnabled(ulong entity, bool enableemission);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_GetEmissionColor(ulong entity, out Vector3 emissioncolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetEmissionColor(ulong entity, ref Vector3 emissioncolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Material_GetEmissionIntensity(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetEmissionIntensity(ulong entity, float emissionintensity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong Material_GetTexture(ulong entity, int type);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Material_SetTexture(ulong entity, int type, ulong textureid);
+
+    #endregion
+
+    #region MaterialObject
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_GetDiffuseTint(ulong materialid, out Vector4 diffuse);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetDiffuseTint(ulong materialid, ref Vector4 diffuse);
+
+	[MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float MaterialObject_GetGlossiness(ulong materialid);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetGlossiness(ulong materialid, float glossiness);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float MaterialObject_GetSpecular(ulong materialid);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetSpecular(ulong materialid, float specular);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool MaterialObject_GetEmissionEnabled(ulong materialid);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetEmissionEnabled(ulong materialid, bool enableemission);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_GetEmissionColor(ulong materialid, out Vector3 emissioncolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetEmissionColor(ulong materialid, ref Vector3 emissioncolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float MaterialObject_GetEmissionIntensity(ulong materialid);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetEmissionIntensity(ulong materialid, float emissionintensity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong MaterialObject_GetTexture(ulong materialid, int type);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void MaterialObject_SetTexture(ulong materialid, int type, ulong textureid);
 
     #endregion
 }

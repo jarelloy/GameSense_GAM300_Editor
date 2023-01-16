@@ -100,9 +100,9 @@ void main()
 
     vec3 vertPos = vec3(texture(uPositionTexture, inUV));
 
-    const float Shininess = mix( 1, 100, 1 - ToLinear(texture( uRoughnessTexture, inUV).r) );
+    const float Shininess = mix( 1, 100, 1 - texture( uRoughnessTexture, inUV).r );
 
-    vec3 glossiveness = ToLinear(texture(uGlossinessTexture, inUV).rgb);
+    vec3 glossiveness = texture(uGlossinessTexture, inUV).rgb;
 
     // Viewer to fragment
 	vec3 EyeDirection = vertPos - pushConsts.world_eye_pos.xyz;
@@ -121,20 +121,20 @@ void main()
 
 	    // Compute the diffuse intensity
 	    float DiffuseI  = max( 0, dot(normal, LightDirection ));
-        vec3 ComputedDiffuse = uniforms.point_light_list[i].intensity * light_color * DiffuseI.rrr * DiffuseColor.rgb;
+        vec3 ComputedDiffuse = DiffuseI.rrr * DiffuseColor.rgb;
 
         // Determine the power for the specular based on how rough something is
         float SpecularI2  = pow( max( 0, dot(normal, normalize( LightDirection - EyeDirection ))), Shininess );
         //vec3 reflectDir = reflect(-LightDirection, normal);  
         //float SpecularI1  = pow( max( 0, dot(-EyeDirection, reflectDir)), Shininess );
-        vec3 ComputedSpecular = uniforms.point_light_list[i].intensity * light_color * SpecularI2.rrr * glossiveness;
+        vec3 ComputedSpecular = SpecularI2.rrr * glossiveness;
 
         // Attenuation
         float denom_atten = (dist / uniforms.point_light_list[i].radius) + 1.0;
         float Attenuation = 1.0 / (denom_atten * denom_atten);
 
 	    // Add the contribution of this light
-        finalColor.rgb += (ComputedDiffuse + ComputedSpecular) * 
+        finalColor.rgb += uniforms.point_light_list[i].intensity * light_color * (ComputedDiffuse + ComputedSpecular) * 
         (uniforms.point_light_list[i].cast_shadows == 1 ? ShadowCalculation(vertPos, i) : 1.f) * 
         Attenuation;
     }
