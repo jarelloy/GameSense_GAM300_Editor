@@ -36,4 +36,16 @@ public class TextObject : Component
             InternalCalls.TextObject_SetColor(entity, ref value);
         }
     }
+
+    public string text
+    {
+        get
+        {
+            return InternalCalls.TextObject_GetText(entity);
+        }
+        set
+        {
+            InternalCalls.TextObject_SetText(entity, value);
+        }
+    }
 }

@@ -44,6 +44,25 @@ public class GameObject
         }
     }
 
+    public int GetChildrenCount()
+    {
+        return InternalCalls.GetEntityChildrenCount_Native(ID);
+    }
+
+    public List<GameObject> GetChildren()
+    {
+        if (GetChildrenCount() == 0)
+            return new List<GameObject>();
+
+        List<GameObject> children = new List<GameObject>();
+        for (int i = 0; i < GetChildrenCount(); ++i)
+        {
+            GameObject child = GetChild(i); // should not be null here; has at least 1 child
+            children.Add(child); // although its possible to add null; list count increases
+        }
+        return children;
+    }
+
     public string Name
     {
         get

@@ -151,6 +151,9 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool Physics_Raycast(ref Vector3 inraypos, ref Vector3 inraydir, float raylength, out ulong entityHit, out Vector3 hitpos, out Vector3 hitnormal);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Physics_GetGravity(out Vector3 outgravity);
+
     #endregion
 
     #region SceneManager
@@ -373,6 +376,12 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void TextObject_SetColor(ulong entity, ref Vector4 incolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern string TextObject_GetText(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void TextObject_SetText(ulong entity, string intext);
 
     #endregion
 
@@ -678,6 +687,9 @@ public static class InternalCalls
     public static extern ulong GetEntityChildID_Native(ulong entity, int index);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern int GetEntityChildrenCount_Native(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern ulong GetEntityIDByName_Native(string name);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -716,6 +728,9 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Audio_Play(ulong entity, int index);
+    
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_IsPlaying(ulong entity, int index);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Audio_Stop(ulong entity, int index);
