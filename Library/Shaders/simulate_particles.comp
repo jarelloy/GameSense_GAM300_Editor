@@ -226,6 +226,7 @@ void main()
 
             // Size
             particle.m_Size += particle.m_SizeOverLifetime * deltaTime;
+            particle.m_Size = max(vec3(0.0), particle.m_Size);
 
             // Rotation
             particle.m_Rotation += particle.m_RotationOverLifetime * deltaTime;
