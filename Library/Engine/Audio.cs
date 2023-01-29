@@ -303,8 +303,8 @@ public class AudioComponent : Component
         InternalCalls.Audio_Unpause(entity, index);
     }
 
-    public void IsPlayingAudio()
+    public bool IsPlayingAudio()
     {
-        InternalCalls.Audio_IsPlaying(entity, index);
+        return InternalCalls.Audio_IsPlaying(entity, index);
     }
 }

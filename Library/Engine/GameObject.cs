@@ -219,19 +219,31 @@ public class GameObject
     public static GameObject Instantiate(GameObject original)
     {
         ulong id = InternalCalls.CreateEntity_Native(original != null ? original.ID : 0);
+
+        if (id == 0)
+            throw new NullReferenceException("Attempted to instantiate a GameObject with ID of 0");
+
         return new GameObject(id);
     }
 
     public static GameObject InstantiateUI(GameObject original)
     {
         ulong id = InternalCalls.CreateEntityUI_Native(original != null ? original.ID : 0);
+
+        if (id == 0)
+            throw new NullReferenceException("Attempted to instantiate a UI GameObject with ID of 0");
+
         return new GameObject(id);
     }
 
     public static GameObject InstantiatePrefab(string prefab)//, bool isUI = false)
     {
         ulong id = InternalCalls.CreateEntityPrefab_Native(prefab);
-        return id == 0 ? null : new GameObject(id);
+
+        if (id == 0)
+            throw new NullReferenceException("Attempted to instantiate a prefab GameObject with ID of 0");
+
+        return new GameObject(id);
     }
 
     public static void Destroy(GameObject obj)
@@ -242,12 +254,20 @@ public class GameObject
     public static GameObject GetEntityIDByName(string name)
     {
         ulong id = InternalCalls.GetEntityIDByName_Native(name);
+
+        if (id == 0)
+            throw new NullReferenceException("Attempted to return a GameObject with ID of 0 through GetEntityIDByName(" + name + ")");
+
         return new GameObject(id);
     }
 
     public static GameObject Find(string name)
     {
         ulong id = InternalCalls.GetEntityIDByName_Native(name);
+
+        if (id == 0)
+            throw new NullReferenceException("Attempted to return a GameObject with ID of 0 through Find(" + name + ")");
+
         return new GameObject(id);
     }
 }

@@ -363,6 +363,34 @@ public static class InternalCalls
 
     #endregion
 
+    #region UICollider
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UICollider_GetEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_SetEnabled(ulong entity, bool inenabled);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float UICollider_GetRadius(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_SetRadius(ulong entity, float inradius);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_GetOffset(ulong entity, out Vector3 outoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_SetOffset(ulong entity, ref Vector3 inoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_GetHalfExtent(ulong entity, out Vector3 outhalfextent);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UICollider_SetHalfExtent(ulong entity, ref Vector3 inhalfextent);
+
+    #endregion
+
     #region TextObject
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -730,7 +758,7 @@ public static class InternalCalls
     public static extern void Audio_Play(ulong entity, int index);
     
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void Audio_IsPlaying(ulong entity, int index);
+    public static extern bool Audio_IsPlaying(ulong entity, int index);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Audio_Stop(ulong entity, int index);

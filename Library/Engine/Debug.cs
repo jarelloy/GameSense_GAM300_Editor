@@ -4,12 +4,16 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 public static class Debug
 {
-    public static void Log(string message)
+    public static void Log(string message, 
+        [CallerFilePath] string file = "",
+        [CallerMemberName] string member = "",
+        [CallerLineNumber] int line = 0)
     {
-        InternalCalls.Log(message);
+        InternalCalls.Log(Path.GetFileName(file) + "::" + member + "(" + line.ToString() + ")" + message);
     }
 
     /*[MethodImpl(MethodImplOptions.InternalCall)]
