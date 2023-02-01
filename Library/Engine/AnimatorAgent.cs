@@ -48,9 +48,9 @@ public class AnimatorAgent : Component
         InternalCalls.Animator_ResetTrigger(entity, conditionName);
     }
 
-    public void PlayAnimState(string stateName)
+    public void PlayAnimState(string stateName, bool toBlend = false, float blendduration = 0.5f, bool staticBlend = false)
     {
-        InternalCalls.Animator_PlayAnim(entity, stateName);
+        InternalCalls.Animator_PlayAnim(entity, stateName, toBlend, blendduration, staticBlend);
     }
 
     public void SetAnimSpeed(string stateName, float speed)

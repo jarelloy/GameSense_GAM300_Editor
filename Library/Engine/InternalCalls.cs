@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 public static class InternalCalls
 {
+    #region Layer
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern string GetLayerName(ulong id);
+
+    #endregion
+
     #region Mesh
 
     [MethodImpl(MethodImplOptions.InternalCall)]
@@ -130,7 +137,7 @@ public static class InternalCalls
     public static extern void Animator_ResetTrigger(ulong entity, string name);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
-    public static extern void Animator_PlayAnim(ulong entity, string name);
+    public static extern void Animator_PlayAnim(ulong entity, string name, bool toBlend, float blendduration, bool staticBlend);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Animator_Pause(ulong entity);
@@ -707,6 +714,9 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void DestroyEntity_Native(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern ulong GetEntityLayerID(ulong entity);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern ulong GetEntityParentID_Native(ulong entity);

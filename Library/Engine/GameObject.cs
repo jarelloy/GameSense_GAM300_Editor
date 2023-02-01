@@ -6,6 +6,40 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+public class Layer
+{
+    public readonly ulong ID = 0;
+    public Layer(ulong id)
+    {
+        ID = id;
+    }
+
+    public string Name
+    {
+        get
+        {
+            return InternalCalls.GetLayerName(ID);
+        }
+    }
+    public static bool operator ==(Layer lhs, Layer rhs) => lhs.Equals(rhs);
+    public static bool operator !=(Layer lhs, Layer rhs) => !lhs.Equals(rhs);
+    public bool Equals(Layer rhs) => ID.Equals(rhs.ID);
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        return obj is Layer && Equals((Layer)obj);
+    }
+    
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (ID.GetHashCode()) * 397;
+        }
+    }
+}
+
 public class GameObject
 {
     const ulong NIL = 0;
@@ -13,6 +47,15 @@ public class GameObject
     public GameObject(ulong e)
     {
         ID = e;
+    }
+
+    public Layer Layer
+    {
+        get
+        {
+            ulong layerid = InternalCalls.GetEntityLayerID(ID);
+            return new Layer(layerid);
+        }
     }
 
     public GameObject Parent
@@ -220,30 +263,45 @@ public class GameObject
     {
         ulong id = InternalCalls.CreateEntity_Native(original != null ? original.ID : 0);
 
-        if (id == 0)
-            throw new NullReferenceException("Attempted to instantiate a GameObject with ID of 0");
-
-        return new GameObject(id);
+        if (id != 0)
+        {
+            return new GameObject(id);
+        }
+        else
+        {
+            Debug.Log("Failure to instantiate a GameObject");
+            return null;
+        }
     }
 
     public static GameObject InstantiateUI(GameObject original)
     {
         ulong id = InternalCalls.CreateEntityUI_Native(original != null ? original.ID : 0);
 
-        if (id == 0)
-            throw new NullReferenceException("Attempted to instantiate a UI GameObject with ID of 0");
-
-        return new GameObject(id);
+        if (id != 0)
+        {
+            return new GameObject(id);
+        }
+        else
+        {
+            Debug.Log("Failure to instantiate a UI GameObject");
+            return null;
+        }
     }
 
     public static GameObject InstantiatePrefab(string prefab)//, bool isUI = false)
     {
         ulong id = InternalCalls.CreateEntityPrefab_Native(prefab);
 
-        if (id == 0)
-            throw new NullReferenceException("Attempted to instantiate a prefab GameObject with ID of 0");
-
-        return new GameObject(id);
+        if (id != 0)
+        {
+            return new GameObject(id);
+        }
+        else
+        {
+            Debug.Log("Attempted to instantiate an Invalid Prefab: " + prefab);
+            return null;
+        }
     }
 
     public static void Destroy(GameObject obj)
@@ -251,23 +309,19 @@ public class GameObject
         InternalCalls.DestroyEntity_Native(obj.ID);
     }
 
-    public static GameObject GetEntityIDByName(string name)
-    {
-        ulong id = InternalCalls.GetEntityIDByName_Native(name);
-
-        if (id == 0)
-            throw new NullReferenceException("Attempted to return a GameObject with ID of 0 through GetEntityIDByName(" + name + ")");
-
-        return new GameObject(id);
-    }
-
     public static GameObject Find(string name)
     {
         ulong id = InternalCalls.GetEntityIDByName_Native(name);
 
-        if (id == 0)
-            throw new NullReferenceException("Attempted to return a GameObject with ID of 0 through Find(" + name + ")");
-
-        return new GameObject(id);
+        if (id != 0)
+        {
+            return new GameObject(id);
+        }
+        else
+        {
+            Debug.Log("Attempted to get an Invalid Name: " + name);
+            return null;
+        }
+        
     }
 }

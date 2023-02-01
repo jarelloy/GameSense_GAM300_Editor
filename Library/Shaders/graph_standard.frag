@@ -18,13 +18,6 @@ layout (location = 4) out vec4 outRoughness;
 layout (location = 5) out vec4 outGlossiness;
 layout (location = 6) out vec4 outEmissive;
 
-layout (binding = 5) uniform sampler2D uDiffuseTexture;
-layout (binding = 6) uniform sampler2D uNormalTexture;
-layout (binding = 7) uniform sampler2D uAmbientTexture;
-layout (binding = 8) uniform sampler2D uRoughnessTexture;
-layout (binding = 9) uniform sampler2D uGlossinessTexture;
-layout (binding = 10) uniform sampler2D uEmissiveTexture;
-
 void main() 
 {
     outPos = vec4(In.WorldPos, 1.0);

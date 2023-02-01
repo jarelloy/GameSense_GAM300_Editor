@@ -94,7 +94,8 @@ void main()
 
     // Read the diffuse color
 	vec4 DiffuseColor = texture(uDiffuseTexture, inUV);
-    
+    finalColor.a = DiffuseColor.a;
+
     // Read normal
     vec3 normal = vec3(texture(uNormalTexture, inUV));
 

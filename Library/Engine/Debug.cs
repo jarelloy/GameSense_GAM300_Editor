@@ -13,7 +13,7 @@ public static class Debug
         [CallerMemberName] string member = "",
         [CallerLineNumber] int line = 0)
     {
-        InternalCalls.Log(Path.GetFileName(file) + "::" + member + "(" + line.ToString() + ")" + message);
+        InternalCalls.Log(Path.GetFileName(file) + "::" + member + "(" + line.ToString() + "): " + message);
     }
 
     /*[MethodImpl(MethodImplOptions.InternalCall)]
