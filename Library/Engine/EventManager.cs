@@ -59,6 +59,7 @@ public class IEvent
         {
             listeners.Remove(l);
         }
+        ToRemove.Clear();
     }
 }
 public static class EventManager
@@ -107,6 +108,14 @@ public static class EventManager
         foreach (IEvent e in subscribers.Values)
         {
             e.RemoveUnsubbedListeners();
+        }
+    }
+
+    public static void RemoveListener(object sender)
+    {
+        foreach (IEvent e in subscribers.Values)
+        {
+            e.RemoveListener(sender);
         }
     }
 }
