@@ -154,4 +154,9 @@ public class Camera : Component
             return result;
         }
     }
+
+    public void Shake(Vector2 direction, float intensity, float fade = 1f)
+    {
+        InternalCalls.Camera_Shake(entity, ref direction, intensity, fade);
+    }
 }

@@ -352,6 +352,9 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void Camera_SetFieldOfView(ulong entity, float value);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void Camera_Shake(ulong entity, ref Vector2 dir, float intensity, float fade);
+
     #endregion
 
     #region UIImage
