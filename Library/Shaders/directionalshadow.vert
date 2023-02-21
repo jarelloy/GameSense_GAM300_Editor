@@ -20,7 +20,7 @@ struct DirectionalLight
     vec4 color;
     float intensity;
     float far_plane;
-    int cast_shadows;
+    int enabled;
     mat4 viewMatrix;
 };
 
@@ -43,7 +43,10 @@ layout (std140, push_constant) uniform PushConstants
     mat4 shadow_matrix;
 } pushConsts;
 
+layout(location = 0) out float fragDepth;
+
 void main()
 {
 	gl_Position = uniforms.directional_light_list[pushConsts.user_param].viewMatrix * objectBuffer.objects[gl_BaseInstance].model_matrix * vec4(inPos, 1.0f);
+    fragDepth = gl_Position.z;
 }

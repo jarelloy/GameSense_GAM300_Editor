@@ -9,7 +9,7 @@ struct PointLight
     float intensity;
     float radius;
     float far_plane;
-    int cast_shadows;
+    int enabled;
 };
 
 layout(std140, binding = 2) uniform UBOLights

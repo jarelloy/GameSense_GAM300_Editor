@@ -54,4 +54,8 @@ public class Mathf
 
         return output;
     }
+
+    public static float Clamp(float value, float min, float max){
+        return Math.Max(Math.Min(max, value), min);
+    }
 }

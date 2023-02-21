@@ -37,17 +37,26 @@ layout(std140, binding = 4) uniform CameraUBO
 } uboCamera;
 
 layout(location = 0) out struct { 
+    vec3 Normal;
     vec2 UV;
+    vec3 WorldPos;
+    vec3 Tangent;
 } Out;
 
 void main() 
 {
-    Out.UV = inUV;
-
     mat4 boneTransform = modeldataBuffer.models[objectBuffer.objects[gl_BaseInstance].model_id].bones_matrices[inBoneIDs[0]] * inWeights[0];
     boneTransform += modeldataBuffer.models[objectBuffer.objects[gl_BaseInstance].model_id].bones_matrices[inBoneIDs[1]] * inWeights[1];
     boneTransform += modeldataBuffer.models[objectBuffer.objects[gl_BaseInstance].model_id].bones_matrices[inBoneIDs[2]] * inWeights[2];
     boneTransform += modeldataBuffer.models[objectBuffer.objects[gl_BaseInstance].model_id].bones_matrices[inBoneIDs[3]] * inWeights[3];
 
-    gl_Position = uboCamera.projection * uboCamera.view * objectBuffer.objects[gl_BaseInstance].model_matrix * boneTransform * vec4(inPos, 1.0f);
+    Out.WorldPos = vec3(objectBuffer.objects[gl_BaseInstance].model_matrix * boneTransform * vec4(inPos, 1.0f));
+    Out.UV = inUV;
+
+    // Normal in world space
+	mat3 mNormal = transpose(inverse(mat3(objectBuffer.objects[gl_BaseInstance].model_matrix)));
+	Out.Normal = mNormal * vec3(boneTransform * vec4(normalize(inNormal), 0.0));	
+	Out.Tangent = mNormal * vec3(boneTransform * vec4(normalize(inTangent), 0.0));
+
+    gl_Position = uboCamera.projection * uboCamera.view * vec4(Out.WorldPos, 1.0f);
 }

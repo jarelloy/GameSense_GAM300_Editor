@@ -29,13 +29,7 @@ layout(std430, binding = 2) buffer ParamUBO
 
 SamplerCode
 
-layout (location = 0) out vec4 outPos;
-layout (location = 1) out vec4 outDiffuse;
-layout (location = 2) out vec4 outNormal;
-layout (location = 3) out vec4 outAmbient;
-layout (location = 4) out vec4 outRoughness;
-layout (location = 5) out vec4 outGlossiness;
-layout (location = 6) out vec4 outEmissive;
+layout (location = 0) out vec4 outDiffuse;
 
 float saturate(float v) { return clamp(v, 0.0,       1.0);       }
 vec2  saturate(vec2  v) { return clamp(v, vec2(0.0), vec2(1.0)); }
@@ -55,20 +49,8 @@ void main()
 	vec3 B = cross(N, T);
 	mat3 TBN = mat3(T, B, N);
 
-    outPos = vec4(In.WorldPos, 1.0);
-
 	ShaderCode
 	
-    if (_Albedo_.a <= _AlphaClipThreshold_) {
-        discard;
-    }
-
-    _Albedo_.a = 1.0;
     outDiffuse = _Albedo_;
-    outNormal = vec4(_Normal_, 1.0);
-    outAmbient = vec4(_Ambient_);
-    outRoughness = vec4(_Roughness_);
-    outGlossiness = vec4(_Glossiness_);
-    outEmissive = _Emissive_;
 }
 

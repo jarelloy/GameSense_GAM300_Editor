@@ -36,48 +36,11 @@ layout (binding = 8) uniform sampler2D uAmbientTexture;
 layout (binding = 9) uniform sampler2D uRoughnessTexture;
 layout (binding = 10) uniform sampler2D uGlossinessTexture;
 layout (binding = 11) uniform sampler2D uEmissiveTexture;
-layout (binding = 12) uniform samplerCubeArray uPointLightDepthMap;
-layout (binding = 13) uniform sampler2DArray uDirectionalLightDepthMap;
 
 layout(std140, binding = 2) uniform UBOLights
 {
     PointLight point_light_list[1000];
 } uniforms;
-
-
-vec3 sampleOffsetDirections[20] = vec3[]
-(
-   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
-   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
-);
-
-float ShadowCalculation(vec3 fragPos, int ls_index)
-{
-    float far_plane = uniforms.point_light_list[ls_index].far_plane;
-    // get vector between fragment position and light position
-    vec3 fragToLight = fragPos - uniforms.point_light_list[ls_index].position;
-    // now get current linear depth as the length between the fragment and light position
-    float currentDepth = length(fragToLight);
-    // now test for shadows
-    float shadow = 0.0;
-    float bias   = 0.15;
-    int samples  = 20;
-    float viewDistance = length(vec3(pushConsts.world_eye_pos) - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
-    for(int i = 0; i < samples; ++i)
-    {
-        vec4 texture_direction = vec4(fragToLight + sampleOffsetDirections[i] * diskRadius, ls_index - pushConsts.user_param);
-        float closestDepth = texture(uPointLightDepthMap, texture_direction).r;
-        closestDepth *= far_plane;   // undo mapping [0;1]
-        if(currentDepth - bias <= closestDepth)
-            shadow += 1.0;
-    }
-    shadow /= float(samples);
-    return shadow;
-}
 
 vec3 ToLinear(vec3 color)
 {
@@ -139,7 +102,6 @@ void main()
 
 	    // Add the contribution of this light
         finalColor.rgb += uniforms.point_light_list[i].intensity * light_color * (ComputedDiffuse + ComputedSpecular) * 
-        ShadowCalculation(vertPos, i) * 
         Attenuation;
     }
 

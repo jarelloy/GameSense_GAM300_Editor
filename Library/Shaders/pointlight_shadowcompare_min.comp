@@ -1,0 +1,26 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+layout (binding = 5, r32f) uniform imageCubeArray resultImage;
+layout (binding = 6, r32f) uniform readonly imageCubeArray inputImage;
+
+layout (std140, push_constant) uniform PushConstants 
+{
+	vec4 world_eye_pos;
+	vec4 ambient_color;
+    vec2 viewport_size;
+    int user_param;
+    int user_param2;
+    int user_param3;
+    int user_param4;
+    int user_param5;
+    int user_param6;
+    mat4 shadow_matrix;
+} pushConsts;
+
+void main()
+{	
+    ivec3 coord = ivec3(gl_GlobalInvocationID.xyz);
+	float r = min(imageLoad(inputImage, coord).r, imageLoad(resultImage, coord).r);
+	imageStore(resultImage, coord, vec4(r, 0.0, 0.0, 0.0));
+}

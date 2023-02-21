@@ -1,7 +1,10 @@
 #version 460
 
 layout(location = 0) in struct {
+    vec3 Normal;
     vec2 UV;
+    vec3 WorldPos;
+    vec3 Tangent;
 } In;
 
 layout (std140, push_constant) uniform PushConstants 

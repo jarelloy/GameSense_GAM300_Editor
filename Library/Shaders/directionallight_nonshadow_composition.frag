@@ -26,8 +26,6 @@ layout (binding = 8) uniform sampler2D uAmbientTexture;
 layout (binding = 9) uniform sampler2D uRoughnessTexture;
 layout (binding = 10) uniform sampler2D uGlossinessTexture;
 layout (binding = 11) uniform sampler2D uEmissiveTexture;
-layout (binding = 12) uniform samplerCubeArray uPointLightDepthMap;
-layout (binding = 13) uniform sampler2DArray uDirectionalLightDepthMap;
 
 struct DirectionalLight
 {
@@ -43,59 +41,6 @@ layout(std140, binding = 2) uniform UBOLights
 {
     DirectionalLight directional_light_list[500];
 } uniforms;
-
-
-vec3 sampleOffsetDirections[20] = vec3[]
-(
-   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
-   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
-);
-
-float textureProj(vec4 P, float ls_index, vec2 offset)
-{
-	float shadow = 1.0;
-	vec4 shadowCoord = P / P.w;
-	shadowCoord.st = shadowCoord.st * 0.5 + 0.5;
-	
-	if (shadowCoord.z > -1.0 && shadowCoord.z < 1.0) 
-	{
-		vec3 textureUV = vec3(shadowCoord.st + offset, ls_index);
-		float dist = texture(uDirectionalLightDepthMap, textureUV).r;
-		if (shadowCoord.w > 0.0 && dist < shadowCoord.z) 
-		{
-			shadow = 0.0;
-		}
-	}
-	return shadow;
-}
-
-float ShadowCalculation(vec3 fragPos, int ls_index)
-{
-    vec4 shadowClip	= uniforms.directional_light_list[ls_index].viewMatrix * vec4(fragPos, 1.0);
-
-	ivec2 texDim = textureSize(uDirectionalLightDepthMap, 0).xy;
-	float scale = 1.5;
-	float dx = scale * 1.0 / float(texDim.x);
-	float dy = scale * 1.0 / float(texDim.y);
-
-	float shadowFactor = 0.0;
-	int count = 0;
-	int range = 1;
-	
-	for (int x = -range; x <= range; x++)
-	{
-		for (int y = -range; y <= range; y++)
-		{
-			shadowFactor += textureProj(shadowClip, ls_index, vec2(dx*x, dy*y));
-			count++;
-		}
-	
-	}
-	return shadowFactor / count;
-}
 
 vec3 ToLinear(vec3 color)
 {
@@ -125,12 +70,13 @@ void main()
     vec3 glossiveness = texture(uGlossinessTexture, inUV).rgb;
 
 	// Viewer to fragment
-	vec3 EyeDirection = vertPos - pushConsts.world_eye_pos.xyz;
+	vec3 EyeDirection =  vertPos - pushConsts.world_eye_pos.xyz;
 	EyeDirection = normalize(EyeDirection);
 
     for (int i = pushConsts.user_param; i < pushConsts.user_param + pushConsts.user_param2; ++i)
     {        
 		if (uniforms.directional_light_list[i].enabled == 0) continue;
+
 		// Directional light color from gamma to linear
 		vec3 light_color = pow(uniforms.directional_light_list[i].color.rgb, vec3(2.20f));
 
@@ -146,8 +92,7 @@ void main()
         vec3 ComputedSpecular = SpecularI2.rrr * glossiveness;
 
 	    // Add the contribution of this light
-        finalColor.rgb += uniforms.directional_light_list[i].intensity * light_color * (ComputedDiffuse + ComputedSpecular) * 
-		ShadowCalculation(vertPos, i);
+        finalColor.rgb += uniforms.directional_light_list[i].intensity * light_color * (ComputedDiffuse + ComputedSpecular);
     }
 
     outFragColor = finalColor;

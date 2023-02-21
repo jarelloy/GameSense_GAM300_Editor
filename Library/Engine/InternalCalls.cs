@@ -159,6 +159,9 @@ public static class InternalCalls
     public static extern bool Physics_Raycast(ref Vector3 inraypos, ref Vector3 inraydir, float raylength, out ulong entityHit, out Vector3 hitpos, out Vector3 hitnormal);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Physics_RaycastLayers(string layer, bool end, ref Vector3 inraypos, ref Vector3 inraydir, float raylength, out ulong entityHit, out Vector3 hitpos, out Vector3 hitnormal);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Physics_GetGravity(out Vector3 outgravity);
 
     #endregion
@@ -370,6 +373,72 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void UIImage_SetColor(ulong entity, ref Vector4 incolor);
+
+    #endregion
+
+    #region PointLight
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool PointLight_GetEnabled(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PointLight_SetEnabled(ulong entity, bool inenabled);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float PointLight_GetIntensity(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PointLight_SetIntensity(ulong entity, float inintensity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float PointLight_GetRadius(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PointLight_SetRadius(ulong entity, float inradius);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PointLight_GetColor(ulong entity, out Vector3 outcolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void PointLight_SetColor(ulong entity, ref Vector3 incolor);
+
+    #endregion
+
+    #region ShaderGraphComponent
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool ShaderGraphComponent_GetEnabled(ulong entity, int index);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetEnabled(ulong entity, int index, bool inenabled);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetOverwriteParameter(ulong entity, int index, string param_name, bool overwrite);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetParameterValueFloat(ulong entity, int index, string param_name, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetParameterValueVec2(ulong entity, int index, string param_name, ref Vector2 value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetParameterValueVec3(ulong entity, int index, string param_name, ref Vector3 value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_SetParameterValueVec4(ulong entity, int index, string param_name, ref Vector4 value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float ShaderGraphComponent_GetParameterValueFloat(ulong entity, int index, string param_name);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_GetParameterValueVec2(ulong entity, int index, string param_name, out Vector2 value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_GetParameterValueVec3(ulong entity, int index, string param_name, out Vector3 value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void ShaderGraphComponent_GetParameterValueVec4(ulong entity, int index, string param_name, out Vector4 value);
+
 
     #endregion
 

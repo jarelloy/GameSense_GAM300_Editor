@@ -24,12 +24,21 @@ layout(std140, binding = 4) uniform CameraUBO
 } uboCamera;
 
 layout(location = 0) out struct { 
+    vec3 Normal;
     vec2 UV;
+    vec3 WorldPos;
+    vec3 Tangent;
 } Out;
 
 void main() 
 {
+    Out.WorldPos = vec3(objectBuffer.objects[gl_BaseInstance].model_matrix * vec4(inPos, 1.0f));
     Out.UV = inUV;
 
+    // Normal in world space
+	mat3 mNormal = transpose(inverse(mat3(objectBuffer.objects[gl_BaseInstance].model_matrix)));
+	Out.Normal = mNormal * normalize(inNormal);	
+	Out.Tangent = mNormal * normalize(inTangent);
+    
     gl_Position = uboCamera.projection * uboCamera.view * objectBuffer.objects[gl_BaseInstance].model_matrix * vec4(inPos, 1.0f);
 }

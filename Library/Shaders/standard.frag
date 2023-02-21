@@ -35,13 +35,19 @@ layout (binding = 8) uniform sampler2D uRoughnessTexture;
 layout (binding = 9) uniform sampler2D uGlossinessTexture;
 layout (binding = 10) uniform sampler2D uEmissiveTexture;
 
-vec3 ToGamma(vec3 color)
+vec3 ToLinear(vec3 color)
 {
     return pow(color, vec3(2.20f));
 }
 
 void main() 
 {
+    vec4 diffuse = texture(uDiffuseTexture, In.UV) * vec4(ToLinear(pushConsts.world_eye_pos.rgb), pushConsts.world_eye_pos.a);
+    if (diffuse.a < 0.01){
+        discard;
+    }
+    diffuse.a = 1.0;
+
     outPos = vec4(In.WorldPos, 1.0);
 
     // Calculate normal in tangent space
@@ -49,7 +55,6 @@ void main()
 	vec3 T = normalize(In.Tangent);
 	vec3 B = cross(N, T);
 	mat3 TBN = mat3(T, B, N);
-
 
     // obtain normal from normal map in range [0,1]
     // vec3 normal = texture(uNormalTexture, In.UV).rgb;
@@ -67,9 +72,7 @@ void main()
     vec3 tnorm = normalize(TBN * normal);
     outNormal = vec4(tnorm, 1.0);
 
-    vec4 diffuseTint = vec4(ToGamma(pushConsts.world_eye_pos.rgb), 1.f);
-
-	outDiffuse = texture(uDiffuseTexture, In.UV) * diffuseTint;
+	outDiffuse = diffuse;
 
     outAmbient = texture(uAmbientTexture, In.UV);
 
@@ -77,6 +80,6 @@ void main()
 
     outGlossiness = texture(uGlossinessTexture, In.UV) * pushConsts.viewport_size.x;
 
-    outEmissive = texture(uEmissiveTexture, In.UV) * vec4(ToGamma(pushConsts.ambient_color.rgb) * pushConsts.ambient_color.a, 1.f);
+    outEmissive = texture(uEmissiveTexture, In.UV) * vec4(ToLinear(pushConsts.ambient_color.rgb) * pushConsts.ambient_color.a, 1.f);
 }
 
