@@ -369,10 +369,70 @@ public static class InternalCalls
     internal static extern void UIImage_SetEnabled(ulong entity, bool inenabled);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float UIImage_GetWidth(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float UIImage_SetWidth(ulong entity, float inwidth);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float UIImage_GetHeight(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float UIImage_SetHeight(ulong entity, float inheight);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void UIImage_GetColor(ulong entity, out Vector4 outcolor);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void UIImage_SetColor(ulong entity, ref Vector4 incolor);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_GetRemapUVX(ulong entity, out Vector2 outremapx);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_SetRemapUVX(ulong entity, ref Vector2 inremapx);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_GetRemapUVY(ulong entity, out Vector2 outremapy);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_SetRemapUVY(ulong entity, ref Vector2 inremapy);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_GetCurrentFrame(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_SetCurrentFrame(ulong entity, int incurrentframe);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_GetStartFrame(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_SetStartFrame(ulong entity, int instartframe);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_GetEndFrame(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_SetEndFrame(ulong entity, int inendframe);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UIImage_GetLooping(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UIImage_SetLooping(ulong entity, bool inlooping);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_GetFPS(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern int UIImage_SetFPS(ulong entity, int infps);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_PlayAnim(ulong entity, bool looping, int start, int end, int current);
+    
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_StopAnim(ulong entity);
 
     #endregion
 

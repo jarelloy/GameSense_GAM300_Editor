@@ -1,6 +1,6 @@
 #version 460
 #extension GL_GOOGLE_include_directive : enable
-#include "random.glsl"
+#include "shadergraph_helpers.glsl"
 
 layout(location = 0) in struct {
     vec3 Normal;
@@ -12,7 +12,7 @@ layout(location = 0) in struct {
 layout (std140, push_constant) uniform PushConstants 
 {
 	vec4 world_eye_pos; // Stores View Direction
-	vec4 ambient_color; // Stores 
+	vec4 ambient_color; // Stores Time -> time, dt, unscaled dt, smoothdelta
     vec2 viewport_size; // Stores 
     int user_param;
     int user_param2;
@@ -30,16 +30,6 @@ layout(std430, binding = 2) buffer ParamUBO
 SamplerCode
 
 layout (location = 0) out vec4 outDiffuse;
-
-float saturate(float v) { return clamp(v, 0.0,       1.0);       }
-vec2  saturate(vec2  v) { return clamp(v, vec2(0.0), vec2(1.0)); }
-vec3  saturate(vec3  v) { return clamp(v, vec3(0.0), vec3(1.0)); }
-vec4  saturate(vec4  v) { return clamp(v, vec4(0.0), vec4(1.0)); }
-
-float fresnelEffect(vec3 normal, vec3 viewDir, float power)
-{
-    return pow((1.0 - saturate(dot(normal, normalize(viewDir)))), power);
-}
 
 void main() 
 {
