@@ -34,8 +34,8 @@ void main()
     vec2 frameSize = vec2(1.0 / pushConsts.user_param2, 1.0 / pushConsts.user_param3);
     vec2 frameUV00 = frameSize * vec2(frameX, frameY);
     Out.UV = vec2(
-        remap(inUV.x, pushConsts.world_eye_pos.xz, vec2(frameUV00.x, frameUV00.x + frameSize.x)), 
-        remap(inUV.y, pushConsts.world_eye_pos.yw, vec2(frameUV00.y, frameUV00.y + frameSize.y))
+        remap(inUV.x, vec2(frameUV00.x, frameUV00.x + frameSize.x), pushConsts.world_eye_pos.xz), 
+        remap(inUV.y, vec2(frameUV00.y, frameUV00.y + frameSize.y), pushConsts.world_eye_pos.yw)
     );
 
     gl_Position = pushConsts.view_projection_matrix * vec4(inPos, 1.0f);
