@@ -29,4 +29,17 @@ public class SphereCollider : Component
             InternalCalls.SphereCollider_SetRadius(entity, index, value);
         }
     }
+
+    public Vector3 offset
+    {
+        get
+        {
+            InternalCalls.SphereCollider_GetOffset(entity, index, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            InternalCalls.SphereCollider_SetOffset(entity, index, ref value);
+        }
+    }
 }

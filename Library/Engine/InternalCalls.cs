@@ -60,6 +60,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void BoxCollider_SetHalfExtents(ulong entity, int index, ref Vector3 invec3);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void BoxCollider_GetOffset(ulong entity, int index, out Vector3 outoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void BoxCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
+
     #endregion
 
     #region CapsuleCollider
@@ -82,6 +88,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void CapsuleCollider_SetHalfHeights(ulong entity, int index, float value);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CapsuleCollider_GetOffset(ulong entity, int index, out Vector3 outoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CapsuleCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
+
     #endregion
 
     #region SphereCollider
@@ -97,6 +109,12 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void SphereCollider_SetRadius(ulong entity, int index, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SphereCollider_GetOffset(ulong entity, int index, out Vector3 outoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SphereCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
 
     #endregion
 

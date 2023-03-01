@@ -30,4 +30,17 @@ public class BoxCollider : Component
             InternalCalls.BoxCollider_SetHalfExtents(entity, index, ref value);
         }
     }
+
+    public Vector3 offset
+    {
+        get
+        {
+            InternalCalls.BoxCollider_GetOffset(entity, index, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            InternalCalls.BoxCollider_SetOffset(entity, index, ref value);
+        }
+    }
 }

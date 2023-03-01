@@ -41,4 +41,17 @@ public class CapsuleCollider : Component
             InternalCalls.CapsuleCollider_SetRadius(entity, index, value);
         }
     }
+
+    public Vector3 offset
+    {
+        get
+        {
+            InternalCalls.CapsuleCollider_GetOffset(entity, index, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            InternalCalls.CapsuleCollider_SetOffset(entity, index, ref value);
+        }
+    }
 }
