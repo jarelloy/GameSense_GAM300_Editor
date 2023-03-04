@@ -154,6 +154,19 @@ public class UIImage : Component
         }
     }
 
+    public bool reverseAnim
+    {
+        get
+        {
+            return InternalCalls.UIImage_GetReverseAnim(entity);
+        }
+
+        set
+        {
+            InternalCalls.UIImage_SetReverseAnim(entity, value);
+        }
+    }
+
     public void PlayAnim(bool looping, int startFrame, int endFrame, int currentFrame = -1)
     {
         currentFrame = currentFrame < 0 ? startFrame : currentFrame;
@@ -163,5 +176,10 @@ public class UIImage : Component
     public void StopAnim()
     {
         InternalCalls.UIImage_StopAnim(entity);
+    }
+
+    public bool IsAnimPlaying()
+    {
+        return InternalCalls.UIImage_IsAnimPlaying(entity);
     }
 }

@@ -447,10 +447,19 @@ public static class InternalCalls
     internal static extern int UIImage_SetFPS(ulong entity, int infps);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UIImage_GetReverseAnim(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern void UIImage_SetReverseAnim(ulong entity, bool inreverseanim);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void UIImage_PlayAnim(ulong entity, bool looping, int start, int end, int current);
     
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern void UIImage_StopAnim(ulong entity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern bool UIImage_IsAnimPlaying(ulong entity);
 
     #endregion
 
