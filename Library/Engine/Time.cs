@@ -18,7 +18,7 @@ public static class Time
     {
         get
         {
-            return 0.02f;
+            return InternalCalls.Time_GetFixedDeltaTime();
         }
     }
     public static float unscaledDeltaTime

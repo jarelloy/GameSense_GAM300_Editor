@@ -215,6 +215,9 @@ public static class InternalCalls
     internal static extern float Time_GetDeltaTime();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    internal static extern float Time_GetFixedDeltaTime();
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     internal static extern float Time_GetGameTime();
 
     [MethodImpl(MethodImplOptions.InternalCall)]
