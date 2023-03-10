@@ -307,4 +307,15 @@ public class AudioComponent : Component
     {
         return InternalCalls.Audio_IsPlaying(entity, index);
     }
+
+    public static void SetSoundGroupVolume(SOUND_GROUP sg, float value)
+    {
+
+        InternalCalls.Audio_SetSoundGroupVolume((int)sg, value);
+    }
+
+    public static float SetSoundGroupVolume(SOUND_GROUP sg)
+    {
+        return InternalCalls.Audio_GetSoundGroupVolume((int)sg);
+    }
 }

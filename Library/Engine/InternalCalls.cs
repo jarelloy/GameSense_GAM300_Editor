@@ -960,6 +960,12 @@ public static class InternalCalls
     public static extern void Audio_SetVolume(ulong entity, int index, float value);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Audio_SetSoundGroupVolume(int sg, float value);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float Audio_GetSoundGroupVolume(int sg);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool Audio_GetLoop(ulong entity, int index);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
