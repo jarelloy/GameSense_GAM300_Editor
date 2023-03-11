@@ -11,6 +11,11 @@ public class ScriptBase
         gameobject = new GameObject(e);
     }
 
+    void UpdateGameObject(GameObject go)
+    {
+        gameobject = go;
+    }
+
     public virtual void Start()
     {
 
