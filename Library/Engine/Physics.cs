@@ -41,4 +41,14 @@ public class Physics
             return gravity;
         }
     }
+
+    public static bool IsColliding(GameObject lhs, GameObject rhs)
+    {
+        return InternalCalls.Physics_IsColliding(lhs.ID, rhs.ID);
+    }
+
+    public static bool GetContactPoint(GameObject lhs, GameObject rhs, out Vector3 contactPt)
+    {
+        return InternalCalls.Physics_GetContactPoint(lhs.ID, rhs.ID, out contactPt);
+    }
 }

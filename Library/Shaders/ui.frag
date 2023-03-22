@@ -28,10 +28,15 @@ vec3 ToLinear(vec3 color)
     return pow(color, vec3(2.20f));
 }
 
+vec3 ToGamma(vec3 color)
+{
+    return pow(color, vec3(1.f / 2.20f));
+}
+
 void main() 
 {
     // Read the texture colors
 	outFragColor = texture(uDiffuseTexture, In.UV);
-	outFragColor = vec4(outFragColor.rgb * ToLinear(pushConsts.color.rgb), outFragColor.a * pushConsts.color.a);
+	outFragColor = vec4(ToGamma(outFragColor.rgb * ToLinear(pushConsts.color.rgb)), outFragColor.a * pushConsts.color.a);
 }
 

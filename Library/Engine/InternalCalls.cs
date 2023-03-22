@@ -182,6 +182,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Physics_GetGravity(out Vector3 outgravity);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Physics_IsColliding(ulong entity1, ulong entity2);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Physics_GetContactPoint(ulong entity1, ulong entity2, out Vector3 contactPt);
+
     #endregion
 
     #region SceneManager
