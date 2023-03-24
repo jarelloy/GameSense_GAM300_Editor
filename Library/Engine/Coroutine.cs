@@ -25,7 +25,7 @@ public static class Coroutine
     {
         for (int i = timedFunctions.Count - 1; i >= 0; i--)
         {
-            timedFunctions[i].timer -= Time.deltaTime;
+            timedFunctions[i].timer -= Time.unscaledDeltaTime;
             if (timedFunctions[i].timer <= 0f)
             {
                 timedFunctions[i].func();

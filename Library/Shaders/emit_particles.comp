@@ -569,7 +569,7 @@ void main()
 		vec3 final_size = vec3(0.0);
 		if (ParticleEngine.m_StartSizeRandom > 0)
 		{
-			final_size = RandomVec3Btwn(ParticleEngine.m_StartSizeValue1, ParticleEngine.m_StartSizeValue2);
+			final_size = vec3(RandomFloatBtwn(ParticleEngine.m_StartSizeValue1.x, ParticleEngine.m_StartSizeValue2.x));
 		}
 		else
 		{
@@ -731,9 +731,9 @@ void main()
 			// Size
 			if (ParticleEngine.m_SizeOverLifetime.m_SizeRandom > 0)
 			{
-				particle.m_SizeOverLifetime = RandomVec3Btwn(
-				ParticleEngine.m_SizeOverLifetime.m_SizeValue1,
-				ParticleEngine.m_SizeOverLifetime.m_SizeValue2);
+				particle.m_SizeOverLifetime = vec3(RandomFloatBtwn(
+				ParticleEngine.m_SizeOverLifetime.m_SizeValue1.x,
+				ParticleEngine.m_SizeOverLifetime.m_SizeValue2.x));
 			}
 			else
 			{
