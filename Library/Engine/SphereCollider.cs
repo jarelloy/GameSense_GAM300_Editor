@@ -42,4 +42,16 @@ public class SphereCollider : Component
             InternalCalls.SphereCollider_SetOffset(entity, index, ref value);
         }
     }
+
+    public float frictionCoeff
+    {
+        get
+        {
+            return InternalCalls.SphereCollider_GetFriction(entity, index);
+        }
+        set
+        {
+            InternalCalls.SphereCollider_SetFriction(entity, index, value);
+        }
+    }
 }

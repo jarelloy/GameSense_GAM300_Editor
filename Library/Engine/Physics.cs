@@ -40,6 +40,10 @@ public class Physics
             InternalCalls.Physics_GetGravity(out Vector3 gravity);
             return gravity;
         }
+        set
+        {
+            InternalCalls.Physics_SetGravity(ref value);
+        }
     }
 
     public static bool IsColliding(GameObject lhs, GameObject rhs)

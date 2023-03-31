@@ -54,4 +54,17 @@ public class CapsuleCollider : Component
             InternalCalls.CapsuleCollider_SetOffset(entity, index, ref value);
         }
     }
+
+    public float frictionCoeff
+    {
+        get
+        {
+            return InternalCalls.CapsuleCollider_GetFriction(entity, index);
+        }
+        set
+        {
+            InternalCalls.CapsuleCollider_SetFriction(entity, index, value);
+        }
+    }
+
 }

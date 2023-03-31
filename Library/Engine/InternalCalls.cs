@@ -66,6 +66,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void BoxCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void BoxCollider_SetFriction(ulong entity, int index, float friction);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float BoxCollider_GetFriction(ulong entity, int index);
+
     #endregion
 
     #region CapsuleCollider
@@ -94,6 +100,12 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void CapsuleCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void CapsuleCollider_SetFriction(ulong entity, int index, float friction);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float CapsuleCollider_GetFriction(ulong entity, int index);
+
     #endregion
 
     #region SphereCollider
@@ -115,6 +127,12 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void SphereCollider_SetOffset(ulong entity, int index, ref Vector3 inoffset);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void SphereCollider_SetFriction(ulong entity, int index, float friction);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern float SphereCollider_GetFriction(ulong entity, int index);
 
     #endregion
 
@@ -181,6 +199,9 @@ public static class InternalCalls
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern void Physics_GetGravity(out Vector3 outgravity);
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern void Physics_SetGravity(ref Vector3 ingravity);
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool Physics_IsColliding(ulong entity1, ulong entity2);

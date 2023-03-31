@@ -43,4 +43,16 @@ public class BoxCollider : Component
             InternalCalls.BoxCollider_SetOffset(entity, index, ref value);
         }
     }
+
+    public float frictionCoeff
+    {
+        get
+        {
+            return InternalCalls.BoxCollider_GetFriction(entity, index);
+        }
+        set
+        {
+            InternalCalls.BoxCollider_SetFriction(entity, index, value);
+        }
+    }
 }
