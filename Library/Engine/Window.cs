@@ -32,6 +32,13 @@ public static class Window
             InternalCalls.Window_SetCursorVisibility(value);
         }
     }
+    public static bool isFocused
+    {
+        get
+        {
+            return InternalCalls.Window_IsFocused();
+        }
+    }
     public static void LockCursor(Vector2Int position)
     {
         InternalCalls.Window_LockCursor(ref position);

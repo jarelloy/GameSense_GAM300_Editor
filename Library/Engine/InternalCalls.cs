@@ -839,6 +839,9 @@ public static class InternalCalls
     [MethodImpl(MethodImplOptions.InternalCall)]
     public static extern bool Window_IsCursorLocked();
 
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    public static extern bool Window_IsFocused();
+
     #endregion
 
     #region Input
